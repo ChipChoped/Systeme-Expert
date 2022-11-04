@@ -1,0 +1,2 @@
+class RuleCoherenceException(Exception):
+    pass

@@ -1,26 +1,24 @@
 from ply import lex as lexer
 
-reserved = {'ET' : 'ET', 'NON' : 'NON'}
-
-tokens = [
-    'IMPLIQUE', 'MOT'
- ] + list(reserved.values())
+reserved = {'ET': 'ET', 'NON': 'NON'}
 
 
 class CustomLexer(object):
+    tokens = [
+        'IMPLIQUE', 'MOT'
+    ] + list(reserved.values())
 
-    def generateLexer():
-        t_IMPLIQUE = r'=>'
-        t_ignore  = ' \t'
+    t_IMPLIQUE = r'=>'
+    t_ignore = ' \t'
 
-        def t_MOT(t):
-            r'[a-zA-Z]+'
-            t.type = reserved.get(t.value,'MOT')    # Check for reserved words
-            return t
+    def t_MOT(self, t):
+        r'[a-zA-Z]+'
+        t.type = reserved.get(t.value, 'MOT')    # Check for reserved words
+        return t
 
-        def t_error(t):
-            print(f"Illegal character ({t.value})")
-            t.lexer.skip(1)
+    def t_error(self, t):
+        print(f"Illegal character ({t.value})")
+        t.lexer.skip(1)
 
-        return lexer.lex()
-
+    def __init__(self):
+        self.lexer = lexer.lex(module=self)
