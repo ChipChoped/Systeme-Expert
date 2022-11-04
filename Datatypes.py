@@ -32,11 +32,18 @@ class Rule(object):
    
     __repr__ = __str__
 
+class Hypothesis(Element):
+    def __str__(self):
+        return super.__str__(self) + "?"
+
+    def str_condensed(self) ->str:
+        return super(Hypothesis, self).str_condensed() + "?"
 
 class Context(object):
     def __init__(self):
         self.facts = []
         self.rules = []
+        self.hypotheses = []
 
     def addFact(self, fact : Element):
         self.facts.append(fact)
@@ -48,6 +55,9 @@ class Context(object):
         except RuleCoherenceException as r:
                 logging.error(r)
                 self.rules.pop()
+
+    def addHypothesis(self, hypothesis : Hypothesis):
+        self.hypotheses.append(hypothesis)
 
     def checkFactBaseCoherence(self):
         pass
@@ -71,4 +81,5 @@ class Context(object):
     def __str__(self):
         ret_str = f"{len(self.facts)} faits : \n [{', '.join([str(elem) for elem in self.facts])}] \n"
         ret_str = ret_str + f"{len(self.rules)} règles : \n " + '\n'.join([str(rule) for rule in self.rules])
+        ret_str = ret_str + f"{len(self.hypotheses)} hypothèses : \n" + '\n'.join([str(hypothesis) for hypothesis in self.hypotheses])
         return ret_str
