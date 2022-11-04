@@ -130,3 +130,6 @@ dmypy.json
 
 parser/parser.out
 parser/parsetab.py
+
+# PyCharm
+.idea/
