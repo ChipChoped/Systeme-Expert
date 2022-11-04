@@ -33,7 +33,6 @@ class CustomParser(object):
         '''hypothese : HYP element'''
 
         logging.debug(f'Hypothèse détectée')
-        return p
 
     def p_premisse_mult(self, p):
         'premisse : element ET premisse'

@@ -5,10 +5,11 @@ reserved = {'ET': 'ET', 'NON': 'NON'}
 
 class CustomLexer(object):
     tokens = [
-        'IMPLIQUE', 'MOT'
+        'IMPLIQUE', 'MOT', 'HYP'
     ] + list(reserved.values())
 
     t_IMPLIQUE = r'=>'
+    t_HYP = r'\?'
     t_ignore = ' \t'
 
     def t_MOT(self, t):
