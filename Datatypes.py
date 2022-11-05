@@ -1,5 +1,5 @@
-import logging
 import collections
+import logging
 
 from CoherenceExceptions import RuleCoherenceException
 
@@ -8,6 +8,12 @@ class Element(object):
     def __init__(self, name : str, positive : bool):
         self.name = name
         self.positive = positive
+
+    def conflict(self, fact):
+        if self.name == fact.name and self.positive != fact.positive:
+            return True
+        else:
+            return False
 
     def __str__(self):
         sign = '' if self.positive else 'NOT '
@@ -22,6 +28,10 @@ class Rule(object):
     def __init__(self, premisse : list, consequence : list):
         self.premisse = premisse
         self.consequence = consequence
+
+    def conflict(self):
+        for premisse in self.premisse:
+
 
     def __str__(self):
         return ((', '.join([str(elem) for elem in self.premisse])) + ' -> ' + (', '.join(str(elem) for elem in self.consequence)))
