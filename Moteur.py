@@ -2,6 +2,20 @@ from __future__ import annotations
 
 
 class Moteur(object):
+    def chainageArriere(self, facts, rules, hypotheses)->list:
+        for hypothesis in hypotheses:
+            rule_found = False
+
+            for rule in rules:
+                for consequence in rule.consequence:
+                    if hypothesis == consequence:
+                        rule_found = True
+                        break
+
+                if rule_found:
+                    for rule.
+
+
 
     #renvoie une base de fait déduite des rêgles
     #sature les rêgles pour l'instant
