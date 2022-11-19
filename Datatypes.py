@@ -15,6 +15,13 @@ class Element(object):
         else:
             return False
 
+    def conflicts(self, facts : list):
+        for fact in facts:
+            if self.name == fact.name and self.positive != fact.positive:
+                return True
+
+        return False
+
     def __str__(self):
         sign = '' if self.positive else 'NOT '
         return f'{sign}{self.name}'
@@ -29,12 +36,8 @@ class Rule(object):
         self.premisse = premisse
         self.consequence = consequence
 
-    def conflict(self):
-        for premisse in self.premisse:
-
-
     def __str__(self):
-        return ((', '.join([str(elem) for elem in self.premisse])) + ' -> ' + (', '.join(str(elem) for elem in self.consequence)))
+        return (', '.join([str(elem) for elem in self.premisse])) + ' -> ' + (', '.join(str(elem) for elem in self.consequence))
 
     def __hash__(self) -> int:
         str_hash = ''.join(sorted([cond.str_condensed() for cond in self.premisse]))+'_'+''.join(sorted([cond.str_condensed() for cond in self.consequence]))
@@ -79,7 +82,7 @@ class Context(object):
         #Liste les hash dupliqués dans plusieurs rêgles
         duplicate_list = [item for item, count in collections.Counter( [rule.__hash__() for rule in self.rules]).items() if count > 1]
 
-        if duplicate_list != []:
+        if duplicate_list:
             result = []
             for dupl_hash in duplicate_list:
                 dupl_rule_pack = [(f'R°{index}', rule) for index, rule in enumerate(self.rules) if rule.__hash__() == dupl_hash]
