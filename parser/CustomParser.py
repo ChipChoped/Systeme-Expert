@@ -11,7 +11,8 @@ class CustomParser(object):
     def p_statement(self, p):
         '''statement : regle
                     | fait
-                    | hypothese'''
+                    | hypothese
+                    | fin'''
 
     def p_fait(self, p):
         '''fait : element'''
@@ -42,13 +43,13 @@ class CustomParser(object):
 
         p[0] = [p[1]] + p[3]
         # logging.debug('premisse mult détectée ')
-        return p 
+        return p
 
     def p_premisse_seul(self, p):
         'premisse : element'
         p[0] = [p[1]]
         # logging.debug('premisse seule détecté ')
-        return p 
+        return p
 
     def p_element_negative(self, p):
         '''element : NON MOT'''
@@ -59,12 +60,17 @@ class CustomParser(object):
 
     def p_element(self, p):
         'element : MOT'
-        
+
         p[0] = Element(p[1], True)
         # logging.debug(f'element positif [{p[1]}] detecte')
         return p
 
-    
+    def p_fin(self, p):
+        """fin : FIN"""
+
+        return p
+
+
     def __init__(self, context : Context):
         self.tokens = CustomLexer.tokens
         self.context = context
