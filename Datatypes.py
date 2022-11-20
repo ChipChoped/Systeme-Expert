@@ -99,6 +99,6 @@ class Context(object):
 
     def __str__(self):
         ret_str = f"{len(self.facts)} faits : \n [{', '.join([str(elem) for elem in self.facts])}] \n"
-        ret_str = ret_str + f"{len(self.rules)} règles : \n " + '\n'.join([str(rule) for rule in self.rules])
-        ret_str = ret_str + f"{len(self.hypotheses)} hypothèses : \n" + '\n'.join([str(hypothesis) for hypothesis in self.hypotheses])
+        ret_str = ret_str + f"{len(self.rules)} règles : \n [{', '.join([str(rule) for rule in self.rules])}] \n"
+        ret_str = ret_str + f"{len(self.hypotheses)} hypothèses : \n [{', '.join([str(hypothesis) for hypothesis in self.hypotheses])}] \n"
         return ret_str
