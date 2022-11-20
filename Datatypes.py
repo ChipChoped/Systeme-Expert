@@ -9,6 +9,12 @@ class Element(object):
         self.name = name
         self.positive = positive
 
+    def __eq__(self, element):
+        if self.name == element.name and self.positive == element.positive:
+            return True
+        else:
+            return False
+
     def conflict(self, fact):
         if self.name == fact.name and self.positive != fact.positive:
             return True
