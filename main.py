@@ -7,18 +7,20 @@ if __name__ == "__main__":
 
     logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
-    print("test du lexer, entrez ce que vous voulez !")
+    print("Alimentation de la base de connaissance :")
 
     custom = CustomParser(Context())
     lexer = CustomLexer().lexer
-    while 1:
+    s = ""
+
+    while not s == 'FIN':
         try:
-            s = input('test > ')
+            s = input('> ')
         except EOFError:
             break
         if not s:
             continue
         custom.parser.parse(s)
-        logging.debug("Etat du context : \n"+str(custom.context))
+        logging.debug("État la base de connaissance : \n" + str(custom.context))
     # result = custom.parser.parse(prompt)
     
