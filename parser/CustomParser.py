@@ -1,5 +1,6 @@
 from parser.CustomLexer import CustomLexer, reserved
-from Datatypes import Context, Element, Rule
+from Datatypes import Element, Rule
+from Context import Context
 
 import ply.yacc as yacc
 import logging
@@ -22,7 +23,6 @@ class CustomParser(object):
 
     def p_regle(self, p):
         '''regle : premisse IMPLIQUE premisse'''
-
         p[0] = Rule(p[1], p[3])
         logging.debug(f'regle détecté : {p[0]}')
         self.context.addRule(p[0])
