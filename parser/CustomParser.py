@@ -1,14 +1,13 @@
 from parser.CustomLexer import CustomLexer, reserved
 from Datatypes import Element, Rule
-from Context import Context
-
+from Moteur import Moteur
 import ply.yacc as yacc
 import logging
 
 
 
 class CustomParser(object):
-
+    
     def p_statement(self, p):
         '''statement : regle
                     | fait'''         
@@ -18,14 +17,14 @@ class CustomParser(object):
 
         logging.debug(f'fait détecté : [{p[1]}]')
         
-        self.context.addFact(p[1])
+        self.moteur.inputFact(p[1])
         return p 
 
     def p_regle(self, p):
         '''regle : premisse IMPLIQUE premisse'''
         p[0] = Rule(p[1], p[3])
         logging.debug(f'regle détecté : {p[0]}')
-        self.context.addRule(p[0])
+        self.moteur.inputRule(p[0])
         return p 
 
     def p_premisse_mult(self, p):
@@ -55,8 +54,8 @@ class CustomParser(object):
         # logging.debug(f'element positif [{p[1]}] detecte')
         return p
 
-    
-    def __init__(self, context : Context):
+    def __init__(self, moteur : Moteur):
         self.tokens = CustomLexer.tokens
-        self.context = context
+        self.moteur = moteur
         self.parser = yacc.yacc(module=self)
+

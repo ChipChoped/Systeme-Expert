@@ -1,4 +1,3 @@
-from Moteur import Moteur
 from Datatypes import Element, Rule
 from CoherenceExceptions import RuleCoherenceException
 import logging
@@ -11,20 +10,13 @@ class Context(object):
         self.facts = []
         self.rules = []
 
-    def addFact(self, fact: Element):
-        self.facts.append(fact)
-        self.facts = Moteur.chainageAvant(self.facts, self.rules)
+    def addFact(self, fact : Element):
+        if fact not in self.facts:
+            self.facts.append(fact)
 
     def addRule(self, rule: Rule):
         self.rules.append(rule)
-        try:
-            self.checkRulesCoherence()
-            self.facts = Moteur.chainageAvant(self.facts, self.rules)
-            
-        except RuleCoherenceException as r:
-            logging.error(r)
-            self.rules.pop()
-
+    
     def checkFactBaseCoherence(self):
         pass
 
@@ -32,7 +24,6 @@ class Context(object):
         self.checkRulesNoDuplicates()
 
     def checkRulesNoDuplicates(self):
-
         # Liste les hash dupliqués dans plusieurs rêgles
         duplicate_list = [item for item, count in collections.Counter(
             [rule.__hash__() for rule in self.rules]).items() if count > 1]
