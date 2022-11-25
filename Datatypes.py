@@ -26,5 +26,8 @@ class Rule(object):
     def __hash__(self) -> int:
         str_hash = '.'.join(sorted([cond.str_condensed() for cond in self.premisse]))+'_'+''.join(sorted([cond.str_condensed() for cond in self.consequence]))
         return hash(str_hash)
-   
+    
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
     __repr__ = __str__

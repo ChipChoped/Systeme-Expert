@@ -1,4 +1,5 @@
 from parser.CustomLexer import CustomLexer, reserved
+from CoherenceExceptions import RuleCoherenceException
 from Datatypes import Element, Rule
 from Moteur import Moteur
 import ply.yacc as yacc
@@ -10,7 +11,13 @@ class CustomParser(object):
     
     def p_statement(self, p):
         '''statement : regle
-                    | fait'''         
+                    | fait
+                    | fonction'''         
+
+    def p_fonction(self, p):
+        '''fonction : MOT OPEN_PAR CLOSE_PAR'''
+        logging.debug(f'fonction détectée !')
+        return p
 
     def p_fait(self, p):
         '''fait : element'''
@@ -24,7 +31,12 @@ class CustomParser(object):
         '''regle : premisse IMPLIQUE premisse'''
         p[0] = Rule(p[1], p[3])
         logging.debug(f'regle détecté : {p[0]}')
-        self.moteur.inputRule(p[0])
+
+        try:
+            self.moteur.inputRule(p[0])
+        except RuleCoherenceException as r:
+            logging.error(r)
+            return None
         return p 
 
     def p_premisse_mult(self, p):

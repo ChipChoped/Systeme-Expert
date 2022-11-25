@@ -15,6 +15,8 @@ class Context(object):
             self.facts.append(fact)
 
     def addRule(self, rule: Rule):
+        if rule in self.rules:
+            raise RuleCoherenceException("duplicate rules found")
         self.rules.append(rule)
     
     def checkFactBaseCoherence(self):
@@ -24,6 +26,8 @@ class Context(object):
         self.checkRulesNoDuplicates()
 
     def checkRulesNoDuplicates(self):
+        """ Deprecated, il faudrait check si une rêgle est dupliquée lors de l'insertion """
+
         # Liste les hash dupliqués dans plusieurs rêgles
         duplicate_list = [item for item, count in collections.Counter(
             [rule.__hash__() for rule in self.rules]).items() if count > 1]

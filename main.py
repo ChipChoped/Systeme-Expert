@@ -6,7 +6,7 @@ import logging
 
 if __name__ == "__main__":
 
-    logging.basicConfig(encoding='utf-8', level=logging.INFO)
+    logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
     print("test du lexer, entrez ce que vous voulez !")
 
