@@ -10,20 +10,19 @@ class Moteur(object):
 
     def inputFact(self, fact: Element):
         self.context.addFact(fact)
-        self.chainageAvant()
+        self.saturateBase()
 
     def inputRule(self, rule: Rule):
         self.context.addRule(rule)
         try:
             self.context.checkRulesCoherence()
-            self.chainageAvant()
+            self.saturateBase()
         except RuleCoherenceException as r:
             logging.error(r)
             self.rules.pop()
 
-    #renvoie une base de fait déduite des rêgles
-    #sature les rêgles pour l'instant
-    def chainageAvant(self):
+    #sature les rêgles afin de déduire la plus grande base de faits possible
+    def saturateBase(self):
         res = True
         base_de_regles : list[Regle] = self.context.rules.copy()
         while base_de_regles != [] and res:
@@ -37,6 +36,7 @@ class Moteur(object):
     # cherche une rêgle afin d'étendre la base de faits
     # renvoie un tuple (index_regle, [faits_deduits]) ou None
     def trouverCorrespondanceRegle(self) -> tuple | None:
+        """Match rule"""
         for index, regle  in enumerate(self.context.rules):
             if Moteur.satisfaction_regle(self.context.facts, regle):
                 return (index, regle.consequence)

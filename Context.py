@@ -1,5 +1,5 @@
 from Datatypes import Element, Rule
-from CoherenceExceptions import RuleCoherenceException
+from CoherenceExceptions import RuleCoherenceException, FactCoherenceException
 import logging
 import collections
 
@@ -11,6 +11,8 @@ class Context(object):
         self.rules = []
 
     def addFact(self, fact : Element):
+        if Element(fact.name, not fact.positive) in self.facts:
+            raise FactCoherenceException(f'{fact.name} is True and False at the same time !')
         if fact not in self.facts:
             self.facts.append(fact)
 
@@ -20,14 +22,15 @@ class Context(object):
         self.rules.append(rule)
     
     def checkFactBaseCoherence(self):
-        pass
+        for fact in self.facts:
+            if Element(fact.name, not fact.positive) in self.facts:
+                raise FactCoherenceException(f'{fact.name} is True and False at the same time !')
 
     def checkRulesCoherence(self):
         self.checkRulesNoDuplicates()
 
     def checkRulesNoDuplicates(self):
         """ Deprecated, il faudrait check si une rêgle est dupliquée lors de l'insertion """
-
         # Liste les hash dupliqués dans plusieurs rêgles
         duplicate_list = [item for item, count in collections.Counter(
             [rule.__hash__() for rule in self.rules]).items() if count > 1]

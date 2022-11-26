@@ -5,13 +5,15 @@ reserved = {'ET': 'ET', 'NON': 'NON'}
 
 class CustomLexer(object):
     tokens = [
-        'IMPLIQUE', 'MOT', 'ID', 'OPEN_PAR', 'CLOSE_PAR'
+        'IMPLIQUE', 'MOT', 'ID', 'OPEN_PAR', 'CLOSE_PAR', 'COMMA'
     ] + list(reserved.values())
 
     t_IMPLIQUE = r'=>'
     t_ignore = r' \t'
     t_OPEN_PAR = r'\('
     t_CLOSE_PAR = r'\)'
+    t_COMMA = r','
+
     
     def t_MOT(self, t):
         r'[a-zA-Z]+'
