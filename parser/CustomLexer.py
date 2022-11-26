@@ -1,6 +1,6 @@
 from ply import lex as lexer
 
-reserved = {'ET': 'ET', 'NON': 'NON', 'FIN': 'FIN'}
+reserved = {'ET': 'ET', 'NON': 'NON'}
 
 
 class CustomLexer(object):

@@ -13,9 +13,8 @@ if __name__ == "__main__":
     custom = CustomParser(Context())
     lexer = CustomLexer().lexer
     moteur = Moteur()
-    s = ""
 
-    while not s == 'FIN':
+    while 1:
         try:
             s = input('> ')
         except EOFError:
@@ -23,7 +22,7 @@ if __name__ == "__main__":
         if not s:
             continue
         custom.parser.parse(s)
-        logging.debug("État la base de connaissance : \n" + str(custom.context))
+        logging.debug("État de la base de connaissance : \n" + str(custom.context))
     # result = custom.parser.parse(prompt)
 
     if custom.context.hypotheses:

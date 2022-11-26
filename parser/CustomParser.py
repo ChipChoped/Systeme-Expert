@@ -11,8 +11,7 @@ class CustomParser(object):
     def p_statement(self, p):
         '''statement : regle
                     | fait
-                    | hypothese
-                    | fin'''
+                    | hypothese'''
 
     def p_fait(self, p):
         '''fait : element'''
@@ -64,12 +63,6 @@ class CustomParser(object):
         p[0] = Element(p[1], True)
         # logging.debug(f'element positif [{p[1]}] detecte')
         return p
-
-    def p_fin(self, p):
-        """fin : FIN"""
-
-        return p
-
 
     def __init__(self, context : Context):
         self.tokens = CustomLexer.tokens
