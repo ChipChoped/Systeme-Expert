@@ -1,6 +1,6 @@
 from parser.CustomLexer import CustomLexer, reserved
 from CoherenceExceptions import RuleCoherenceException
-from Datatypes import Element, Rule
+from Datatypes import Element, Rule, Metarule, ConcreteRule
 from Moteur import Moteur
 import ply.yacc as yacc
 import logging
@@ -10,22 +10,30 @@ import logging
 class CustomParser(object):
     
     def c_load(self, file_path, *args):
-        """imparfait : ne peut pas prendre de caractères spéciaux 
-        à cause des limitations actuelles du parser"""
         file : TextIoWrapper = open(file_path, "r")
         for line in file:
             self.parser.parse(line)
 
+    def c_context(self, *args):
+        print(self.moteur.context)
+
+    def c_forward(self, *args):
+        print("chainage avant, avec pour but : "+str(args))
+        faits_ajoutes, regles_utilises = self.moteur.chainageAvant(args)
+        print(f'Added facts : {faits_ajoutes}, used rules : {regles_utilises}')
+
+
     def p_statement(self, p):
         '''statement : regle
                     | fait
-                    | fonction'''         
+                    | fonction
+                    | metaregle'''         
 
     def p_fonction_arg(self, p):
         '''fonction : MOT OPEN_PAR argument CLOSE_PAR'''
+        logging.debug(f'fonction détectée !, {p[1]}')
         fun = getattr(self, "c_"+p[1])
         fun(*p[3])
-        logging.debug(f'fonction détectée !')
     
     def p_fonction_no_arg(self, p):
         '''fonction : MOT OPEN_PAR CLOSE_PAR'''
@@ -36,13 +44,24 @@ class CustomParser(object):
 
 
     def p_argument_seul(self, p):
-        '''argument : MOT'''
+        '''argument : MOT
+                    | STRING'''
+        p[0] = [p[1]]
+        return p
+
+    def p_arguments_ordonnes(self, p):
+        '''ordonnes : MOT GREATER ordonnes'''
+        p[0] = [p[1]]+p[3]
+        return p
+
+    def p_argument_ordonne_seul(self, p):
+        '''ordonnes : MOT '''
         p[0] = [p[1]]
         return p
 
     def p_ensemble_arguments(self, p):
         '''argument : MOT COMMA argument'''
-        p[0] = p[1]+p[3]
+        p[0] = [p[1]]+p[3]
         return p
 
     def p_fait(self, p):
@@ -53,8 +72,8 @@ class CustomParser(object):
         return p 
 
     def p_regle(self, p):
-        '''regle : premisse IMPLIQUE premisse'''
-        p[0] = Rule(p[1], p[3])
+        '''regle : MOT DEUX_POINTS premisse IMPLIQUE premisse'''
+        p[0] = ConcreteRule(p[3], p[5], p[1])
         logging.debug(f'regle détecté : {p[0]}')
 
         try:
@@ -63,6 +82,14 @@ class CustomParser(object):
             logging.error(r)
             return None
         return p 
+
+
+    def p_metaregle_ordonne(self, p):
+        '''metaregle : MOT DEUX_POINTS OPEN_BRACK ordonnes CLOSE_BRACK'''
+        logging.debug(f'Metaregle détectée : {p[1]}, {p[4]}')
+        meta : Metarule
+        self.moteur.createMetarule(p[1], p[4], True)
+        return p
 
     def p_premisse_mult(self, p):
         'premisse : element ET premisse'

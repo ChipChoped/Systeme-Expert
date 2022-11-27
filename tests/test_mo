@@ -1,0 +1,5 @@
+R1 : PlusCafe => AcheterCafe
+R2 : AcheterCafe ET CasinoOuvert => CoursesCasino
+R3 : AcheterCafe ET CarrefourOuvert => CoursesCarrefour
+R4 : AcheterCafe ET NON SOUS => TirerArgent
+PrioriteCourses : [R3 > R2]

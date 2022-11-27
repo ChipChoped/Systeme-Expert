@@ -3,6 +3,7 @@ from parser.CustomParser import CustomParser
 from Moteur import Moteur
 from Context import Context
 import logging
+import readline
 
 if __name__ == "__main__":
 
