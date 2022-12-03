@@ -1,7 +1,5 @@
-from Datatypes import Element, Rule, Metarule, ConcreteRule
-from CoherenceExceptions import RuleCoherenceException
+from Datatypes import Element, Rule, ConcreteRule
 from Context import Context
-import logging
 import copy
 
 #TODO : résoudre le cassage du chainage avant
