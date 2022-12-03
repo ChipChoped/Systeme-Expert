@@ -1,6 +1,6 @@
-from parser.CustomLexer import CustomLexer, reserved
+from parser.CustomLexer import CustomLexer
 from CoherenceExceptions import RuleCoherenceException
-from Datatypes import Element, Rule, Metarule, ConcreteRule
+from Datatypes import Element, Metarule, ConcreteRule
 from Moteur import Moteur
 import ply.yacc as yacc
 import logging
