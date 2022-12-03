@@ -1,4 +1,0 @@
-a : A=>B
-b : A=>C
-ab : [a>b]
-bc : [a>b]
