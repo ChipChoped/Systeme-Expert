@@ -71,3 +71,38 @@ class Moteur(object):
             else:
                 return False
         return True
+
+
+    def chainageArriere(self, hypotheses : list[str]):
+        right_hypotheses = []
+        hypotheses = [Element(hypothesis, True) for hypothesis in hypotheses]
+
+        simulation_context: Context = copy.deepcopy(self.context)
+
+        for hypothesis in hypotheses:
+            for rule in list(simulation_context.rules.values()):
+                returned_rule = rule.concludes(hypothesis)
+                if returned_rule:
+                    for fact in list(simulation_context.facts.values()):
+                        if fact.conflicts(returned_rule[0].consequence):
+                            break
+
+                        applicable_rule = True
+
+                        for premisse in returned_rule[0].premisse:
+                            if premisse.conflicts(list(simulation_context.facts.values())):
+                                applicable_rule = False
+
+                        if applicable_rule:
+                            true_hypothesis = True
+                            for premisse in returned_rule[0].premisse:
+                                if list(simulation_context.facts.values()).count(premisse) == 0:
+                                    if not self.chainageArriere([premisse.name]):
+                                        true_hypothesis = False
+                                        break
+
+                            if true_hypothesis:
+                                right_hypotheses.append(hypothesis)
+                                break
+
+        return right_hypotheses

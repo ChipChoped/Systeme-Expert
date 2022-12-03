@@ -13,10 +13,13 @@ B11 : GuestSophisticated => Wine
 WineRules : [B9 > B10]
 B12 : EntreeMexican => BeerIndicated
 B13 : NON GuestWellLiked ET EntreeDeadWish => BeerIndicated
+B14 : True => Water
+True
 EntreeDeadWish
 EntreeMexican
 NON GuestWellLiked
 GuestSophisticated
 NewYearsEve
 EntreeChicken
-forward(BondChampagne, ChateauEarl, HonestHenryAppleWine, ToeLakesRose, DosEquisCoors, Glops, CarrotJuice)
+forward(BondChampagne, ChateauEarl, HonestHenryAppleWine, ToeLakesRose, DosEquis, Coors, Glops, CarrotJuice, Water)
+backward(BondChampagne, ChateauEarl, HonestHenryAppleWine, ToeLakesRose, DosEquis, Coors, Glops, CarrotJuice, Water)

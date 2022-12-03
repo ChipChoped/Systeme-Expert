@@ -22,6 +22,11 @@ class CustomParser(object):
         faits_ajoutes, regles_utilises = self.moteur.chainageAvant(args)
         print(f'Added facts : {faits_ajoutes}, used rules : {regles_utilises}')
 
+    def c_backward(self, *args):
+        print("chainage arrière, avec pour hypothèses : " + str(args))
+        hypotheses_vraies = self.moteur.chainageArriere(args)
+        print(f'Right hypotheses : {hypotheses_vraies}')
+
 
     def p_statement(self, p):
         '''statement : regle

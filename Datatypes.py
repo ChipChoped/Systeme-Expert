@@ -13,6 +13,19 @@ class Element(object):
     
     def str_condensed(self)->str:
         return ('' if self.positive else 'N-')+self.name
+
+    def conflict(self, fact):
+        if self.name == fact.name and self.positive != fact.positive:
+            return True
+        else:
+            return False
+
+    def conflicts(self, facts: list):
+        for fact in facts:
+            if self.name == fact.name and self.positive != fact.positive:
+                return True
+
+        return False
     
     def __eq__(self, other):
         return other.name == self.name and other.positive == self.positive
@@ -28,6 +41,10 @@ class Rule(ABC):
 
     @abstractclassmethod
     def satisfy(self, facts : list[Element]) -> tuple[ConcreteRule, str] | None: 
+        pass
+
+    @abstractclassmethod
+    def concludes(self, fact: Element) -> tuple[ConcreteRule, str] | None:
         pass
 
     @abstractclassmethod
@@ -51,6 +68,12 @@ class ConcreteRule(Rule):
     def satisfy(self, facts : list[Element]) -> tuple[ConcreteRule, str] | None: 
         if set(self.premisse).issubset(set(facts)):
             return (self, self.name)
+        return None
+
+    def concludes(self, fact : Element) -> tuple[ConcreteRule, str] | None:
+        if self.consequence.count(fact):
+        # if set(self.consequence).issubset(set(facts)):
+            return self, self.name
         return None
 
     def __str__(self):
@@ -78,6 +101,13 @@ class Metarule(Rule):
             ret = rule.satisfy(facts)
             if ret : 
                 return (rule, self.name)    
+        return None
+
+    def concludes(self, fact : Element) -> tuple[ConcreteRule, str] | None:
+        for rule in self.rule_list:
+            ret = rule.concludes(fact)
+            if ret:
+                return rule, self.name
         return None
 
     def __str__(self):
