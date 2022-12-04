@@ -1,4 +1,4 @@
-from Datatypes import Element, Rule, Metarule, ConcreteRule
+from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes
 from CoherenceExceptions import RuleCoherenceException, FactCoherenceException
 import logging
 import collections
@@ -7,14 +7,19 @@ import collections
 class Context(object):
 
     def __init__(self):
+        self.declared_elements : dict[VariableTypes] = dict()
         self.facts : dict[Element] = dict()
         self.rules : dict[Rule] = dict()
 
     def addFact(self, fact : Element):
         check_fact : Element | None = self.facts.get(fact.name) 
-        if check_fact and check_fact.positive != fact.positive:
-            raise FactCoherenceException(f'{fact.name} is True and False at the same time !')
+        
+        if (self.declared_elements.get(fact.name) is not None) and (self.declared_elements.get(fact.name) != fact.type):
+            raise FactCoherenceException(f'Element already declared under another type')
+        if check_fact is not None and fact.conflict(check_fact):
+            raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
         self.facts[fact.name] = fact
+        self.declared_elements[fact.name] = fact.type
 
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):

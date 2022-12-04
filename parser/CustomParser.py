@@ -1,6 +1,6 @@
 from parser.CustomLexer import CustomLexer
 from CoherenceExceptions import RuleCoherenceException
-from Datatypes import Element, Metarule, ConcreteRule
+from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem
 from Moteur import Moteur
 import ply.yacc as yacc
 import logging
@@ -48,22 +48,28 @@ class CustomParser(object):
 
     def p_assignation_value(self,p):
         '''assignation : MOT EQUALS value'''
-        logging.debug('assignation with value')        
+        logging.debug('assignation with value')   
+        p[3].name = p[1]
+        self.moteur.inputFact(p[3])     
         return p
  
     def p_assignation_boolean(self, p):
-        '''assignation : '''
-        logging.debug('assignation with boolean')        
+        '''assignation : boolean'''
+        logging.debug('assignation with boolean')     
+        self.moteur.inputFact(p[1])   
         return p
 
     def p_value_enum(self, p):
         '''value : MOT'''
-        logging.debug('enum')        
+        logging.debug('enum')  
+        p[0] = EnumElem("",p[1])      
         return p
 
     def p_value_number(self, p):
         '''value : NUMBER'''
-        logging.debug('number')        
+        logging.debug('number')
+        p[0] = Number("",p[1])      
+    
         return p
 
     def p_argument_seul(self, p):
@@ -87,12 +93,12 @@ class CustomParser(object):
         p[0] = [p[1]]+p[3]
         return p
 
-    def p_fait(self, p):
-        '''fait : element'''
-        logging.debug(f'fait détecté : [{p[1]}]')
+    # def p_fait(self, p):
+    #     '''fait : element'''
+    #     logging.debug(f'fait détecté : [{p[1]}]')
         
-        self.moteur.inputFact(p[1])
-        return p 
+    #     self.moteur.inputFact(p[1])
+    #     return p 
 
     def p_regle(self, p):
         '''regle : MOT DEUX_POINTS premisse IMPLIQUE premisse'''
@@ -115,29 +121,29 @@ class CustomParser(object):
         return p
 
     def p_premisse_mult(self, p):
-        'premisse : element ET premisse'
+        'premisse : boolean ET premisse'
 
         p[0] = [p[1]] + p[3]
         logging.debug('premisse mult détectée ')
         return p 
 
     def p_premisse_seul(self, p):
-        'premisse : element'
+        'premisse : boolean'
         p[0] = [p[1]]
         logging.debug('premisse seule détecté ')
         return p 
 
-    def p_element_negative(self, p):
-        '''element : NON MOT'''
+    def p_boolean_negative(self, p):
+        '''boolean : NON MOT'''
 
-        p[0] = Element(p[2], False)
+        p[0] = Boolean(p[2], False)
         # logging.debug(f'element negatif [{p[2]}] detecte')
         return p
 
-    def p_element(self, p):
-        'element : MOT'
+    def p_boolean(self, p):
+        'boolean : MOT'
         
-        p[0] = Element(p[1], True)
+        p[0] = Boolean(p[1], True)
         # logging.debug(f'element positif [{p[1]}] detecte')
         return p
 

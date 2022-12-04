@@ -1,38 +1,81 @@
 from __future__ import annotations #permet de retourner ConcreteRule dans une Rule
 from abc import ABC, abstractclassmethod
+from enum import Enum
 
+class VariableTypes(Enum):
+    BOOLEAN = 1
+    NUMBER = 2
+    ENUM = 3
 
-class Element(object):
-    def __init__(self, name : str, positive : bool):
+class Element(ABC):
+    def __init__(self, name : str, value : object, type : VariableTypes):
         self.name = name
-        self.positive = positive
-
-    def __str__(self):
-        sign = '' if self.positive == True else 'NOT '
-        return f'{sign}{self.name}'
+        self.type = type
+        self.value = value
     
+    @abstractclassmethod
+    def __str__(self) -> str:
+        pass
+
+    @abstractclassmethod
     def str_condensed(self)->str:
-        return ('' if self.positive else 'N-')+self.name
+        pass
 
-    def conflict(self, fact):
-        if self.name == fact.name and self.positive != fact.positive:
-            return True
-        else:
-            return False
-
-    def conflicts(self, facts: list):
-        for fact in facts:
-            if self.name == fact.name and self.positive != fact.positive:
-                return True
-
-        return False
+    def conflict(self, elem : Element) -> bool:
+        return elem.name == self.name and (elem.type != self.type or elem.value != self.value)
     
+    
+    def conflicts(self, elems: list[Element]):
+        return any([self.conflict(elem) for elem in elems])
+
     def __eq__(self, other):
-        return other.name == self.name and other.positive == self.positive
+        return other.name == self.name and other.value == self.value
+
     def __hash__(self):
         return hash(self.str_condensed())
 
     __repr__ = __str__
+
+
+class Boolean(Element):
+    def __init__(self, name : str, value : bool):
+        super().__init__(name, value, VariableTypes.BOOLEAN)
+    
+    def __str__(self):
+        sign = '' if self.value else 'NOT '
+        return f'{sign}{self.name}'
+    
+    def str_condensed(self)->str:
+        return ('' if self.value else 'N-')+self.name
+    
+    __repr__ = __str__
+
+
+class Number(Element):
+    def __init__(self, name : str, value : int | float):
+        super().__init__(name, value, VariableTypes.NUMBER)
+    
+    def __str__(self):
+        return f'{self.name}[{self.value}]'
+    
+    def str_condensed(self)->str:
+        return f'{self.name}[{self.value}]'
+    
+    __repr__ = __str__
+ 
+class EnumElem(Element):
+    def __init__(self, name : str, value : str):
+        super().__init__(name, value, VariableTypes.ENUM)
+    
+    def __str__(self):
+        return f'{self.name}[{self.value}]'
+    
+    def str_condensed(self)->str:
+        return f'{self.name}[{self.value}]'
+    
+    __repr__ = __str__
+
+
 
 class Rule(ABC):
 
@@ -61,7 +104,7 @@ class Rule(ABC):
 
 class ConcreteRule(Rule):
     def __init__(self, premisse : list[Element], consequence : list[Element], name : str):
-        Rule.__init__(self, name)
+        super().__init__(self, name)
         self.premisse = premisse
         self.consequence = consequence
 
