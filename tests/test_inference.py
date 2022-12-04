@@ -3,7 +3,7 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import Element, ConcreteRule
+from Datatypes import Element, ConcreteRule, Boolean
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -29,14 +29,21 @@ def test_backward_chaining(base_context):
 def test_forward_chaining(base_context):
     base_context.parser.parse('load("ressources/ex2")')
     added_facts, used_rules = base_context.moteur.chainageAvant(
-        ['BondChampagne', 'ChateauEarl', 'HonestHenryAppleWine', 'ToeLakesRose', 'DosEquis',
-            'Coors', 'Glops', 'CarrotJuice', 'Water'])
-    right_added_facts = '[Wine, CheapWine, HonestHenryAppleWine]'
-    rights_used_rules = '[B11 : GuestSophisticated -> Wine, B10 : Wine -> CheapWine, B3 : CheapWine, EntreeChicken, NOT GuestWellLiked -> HonestHenryAppleWine]'
+        [Boolean('BondChampagne', True), Boolean('ChateauEarl', True), Boolean('HonestHenryAppleWine', True), Boolean('ToeLakesRose', True), Boolean('DosEquis', True),
+            Boolean('Coors', True), Boolean('Glops', True), Boolean('CarrotJuice', True), Boolean('Water', True)])
     
-    print("added facts : ")
-    print(added_facts)
+    # print("added facts : ")
+    # print(added_facts)
+
+    # print("used_rules :")
+    # print(used_rules)
+
+    print(base_context.moteur.context.rules)
+
     
-    assert added_facts.__str__() == right_added_facts
-    assert used_rules.__str__() == rights_used_rules
+    right_added_facts = [Boolean('Wine', True), Boolean('CheapWine', True), Boolean('HonestHenryAppleWine', True)]
+    rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3']]
+    
+    assert added_facts == right_added_facts
+    assert used_rules == rights_used_rules
 

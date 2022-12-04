@@ -32,13 +32,13 @@ class Moteur(object):
         faits_ajoutes : list[Fact] = list()
         # return_context : Context = Context()
         
-        objectives = [Element(objective, True) for objective in objectives]
+        # objectives = [Element(objective, True) for objective in objectives]
 
         simulation_context : Context = copy.deepcopy(self.context)
 
         res = True
         while simulation_context.rules.values() != [] and res and not any([objective in list(simulation_context.facts.values()) for objective in objectives]):
-            ajout  = Moteur.trouverCorrespondanceRegle(list(simulation_context.facts.values()),list(simulation_context.rules.values()))
+            ajout  = Moteur.trouverCorrespondanceRegle(simulation_context.facts ,list(simulation_context.rules.values()))
             if ajout is None:
                 res = False
             else :

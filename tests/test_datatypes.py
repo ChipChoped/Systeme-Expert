@@ -98,4 +98,10 @@ def test_contraint_number_validity():
     assert not c2.satisfy(n1)
     assert c3.satisfy(n1)
 
-   
+def test_constraint_satisfiable():
+    c1 = Constraint(Number("name", 3), OperatorTypes.EQUALS)
+    facts = {"truc" : Number("truc", 3),"name" : Number("name",3)}
+    assert c1.satisfiable(facts)
+    
+    facts = {"truc" : Number("truc", 3),"name" : Number("name",4)}
+    assert not c1.satisfiable(facts)

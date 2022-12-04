@@ -126,6 +126,9 @@ class Constraint(object):
     def satisfy(self, other : Element) -> bool:
         result : bool = other.type == self.elem.type and getattr(other, op_list[int(self.operator)])(self.elem)
         return result if self.positive else not result
+    
+    def satisfiable(self, other : dict[Element]):
+        return False if other.get(self.elem.name) is None else self.satisfy(other[self.elem.name])
     __repr__ = __str__
 
 
@@ -160,8 +163,8 @@ class ConcreteRule(Rule):
         self.premisse = premisse
         self.consequence = consequence
 
-    def satisfy(self, facts : list[Element]) -> tuple[ConcreteRule, str] | None: 
-        if set(self.premisse).issubset(set(facts)):
+    def satisfy(self, facts : dict[Element]) -> tuple[ConcreteRule, str] | None: 
+        if all([constraint.satisfiable(facts) for constraint in self.premisse]):
             return (self, self.name)
         return None
 
