@@ -3,7 +3,8 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import Element, ConcreteRule, Boolean, Number, EnumElem, VariableTypes
+from Datatypes import *
+from CoherenceExceptions import *
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -49,3 +50,11 @@ def test_add_fact_conflict_type(base_context):
         base_context.moteur.context.addFact(b2)
 
 
+def test_add_rule(base_context):
+    r1 = ConcreteRule([Constraint(Number("test", 2), OperatorTypes.GREATER)], [Number("test2",3)], 'r1')
+    base_context.moteur.inputRule(r1)
+    
+    with pytest.raises(TypeCoherenceException) as e_info:
+        r2 = ConcreteRule([Constraint(Boolean("test", True), OperatorTypes.EQUALS)], [Number("test2",3)], 'r1')
+        base_context.moteur.inputRule(r2)
+   

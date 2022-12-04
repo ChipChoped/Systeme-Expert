@@ -6,3 +6,9 @@ class FactCoherenceException(Exception):
 
 class RuleUnknown(Exception):
     pass
+
+class ConstraintCoherenceException(Exception):
+    pass
+
+class TypeCoherenceException(Exception):
+    pass

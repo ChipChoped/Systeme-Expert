@@ -3,7 +3,7 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import Element, ConcreteRule, Boolean, Number, EnumElem, VariableTypes
+from Datatypes import OperatorTypes, Constraint, Element, ConcreteRule, Boolean, Number, EnumElem, VariableTypes
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -63,3 +63,39 @@ def test_enum_conflict():
 
 def test_variable_type():
     assert VariableTypes.BOOLEAN != VariableTypes.NUMBER
+
+def test_constraint_nok():
+    with pytest.raises(Exception) as e_info:
+        c1 = Constraint(Boolean("name", True), OperatorTypes.GREATER)
+
+def test_constraint_bool():
+    c1 = Constraint(Boolean("name", True), OperatorTypes.EQUALS)
+    assert c1.str_condensed() == 'name_equal_True'
+    c2 = Constraint(Boolean("name", False), OperatorTypes.EQUALS)
+    assert c2.str_condensed() == 'name_equal_False'
+
+def test_constraint_number():
+    n1 = Constraint(Number("name", 3), OperatorTypes.GREATER)
+    assert n1.str_condensed() == 'name_greater_3'
+    n2 = Constraint(Number("name", 3), OperatorTypes.GREATER_OR_EQUAL)
+    assert n2.str_condensed() == 'name_greaterOrEqual_3'
+
+def test_contraint_bool_validity():
+    c1 = Constraint(Boolean("name", True), OperatorTypes.EQUALS)
+    b2 = Boolean("autre", True)
+    assert c1.satisfy(b2)
+
+    b3 = Boolean("encore_autre", False)
+    assert not c1.satisfy(b3)
+
+def test_contraint_number_validity():
+    c1 = Constraint(Number("name", 3), OperatorTypes.EQUALS)
+    c2 = Constraint(Number("name", 2), OperatorTypes.EQUALS)
+    c3 = Constraint(Number("name", 2), OperatorTypes.GREATER)
+
+    n1 = Number("autre", 3)
+    assert c1.satisfy(n1)
+    assert not c2.satisfy(n1)
+    assert c3.satisfy(n1)
+
+   

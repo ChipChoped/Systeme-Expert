@@ -1,5 +1,5 @@
 from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes
-from CoherenceExceptions import RuleCoherenceException, FactCoherenceException
+from CoherenceExceptions import *
 import logging
 import collections
 
@@ -7,24 +7,29 @@ import collections
 class Context(object):
 
     def __init__(self):
-        self.declared_elements : dict[VariableTypes] = dict()
+        self.type_binding : dict[VariableTypes] = dict()
         self.facts : dict[Element] = dict()
         self.rules : dict[Rule] = dict()
 
     def addFact(self, fact : Element):
         check_fact : Element | None = self.facts.get(fact.name) 
         
-        if (self.declared_elements.get(fact.name) is not None) and (self.declared_elements.get(fact.name) != fact.type):
-            raise FactCoherenceException(f'Element already declared under another type')
         if check_fact is not None and fact.conflict(check_fact):
             raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
+        self.BindType(fact)
         self.facts[fact.name] = fact
-        self.declared_elements[fact.name] = fact.type
 
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):
         if rule in self.rules.values():
             raise RuleCoherenceException("duplicate rules found")
+        
+        [self.checkTypeCoherence(constraint.elem) for constraint in rule.premisse]
+        [self.checkTypeCoherence(elem) for elem in rule.consequence]
+
+        [self.BindType(constraint.elem) for constraint in rule.premisse]
+        [self.BindType(elem) for elem in rule.consequence]
+        
         self.rules[rule.name] = rule
     
     def addMetarule(self, meta_rule_name : str, rule_list : list[str], sorted : bool = True):
@@ -44,8 +49,17 @@ class Context(object):
         self.rules[meta_rule_name] = meta_rule
         [self.rules.pop(rule_name) for rule_name in rule_list]
 
+    def BindType(self, element : Element)->None:
+        if self.type_binding.get(element.name) is None:
+            self.type_binding[element.name] = element.type
+        else : self.checkTypeCoherence(element)
 
-    
+ 
+    def checkTypeCoherence(self, element : Element):
+        if self.type_binding.get(element.name) is not None and self.type_binding[element.name] != element.type:
+            raise TypeCoherenceException(f'Element {element.name} already declared as {self.type_binding[element.name]}, trying to rebind it as {element.type}')
+
+
     def checkFactBaseCoherence(self):
         for fact in self.facts:
             if Element(fact.name, not fact.positive) in self.facts:

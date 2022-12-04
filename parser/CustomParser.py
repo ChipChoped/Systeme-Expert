@@ -1,6 +1,6 @@
 from parser.CustomLexer import CustomLexer
 from CoherenceExceptions import RuleCoherenceException
-from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem
+from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem, Constraint, OperatorTypes
 from Moteur import Moteur
 import ply.yacc as yacc
 import logging
@@ -28,10 +28,18 @@ class CustomParser(object):
         print(f'Right hypotheses : {hypotheses_vraies}')
 
     def p_statement(self, p):
-        '''statement : regle
-                    | assignation
-                    | fonction
+        '''statement : fonction
                     | metaregle'''         
+
+    def p_statement_assignation(self, p):
+        '''statement : assignation'''
+        self.moteur.inputFact(p[1])     
+        return p
+
+    def p_statement_rule(self,p):
+        ''' statement : regle '''
+        self.moteur.inputRule(p[1])
+        return p
 
     def p_fonction_arg(self, p):
         '''fonction : MOT OPEN_PAR argument CLOSE_PAR'''
@@ -49,14 +57,15 @@ class CustomParser(object):
     def p_assignation_value(self,p):
         '''assignation : MOT EQUALS value'''
         logging.debug('assignation with value')   
-        p[3].name = p[1]
-        self.moteur.inputFact(p[3])     
+        assignation = p[3]
+        assignation.name = p[1]
+        p[0] = assignation
         return p
  
     def p_assignation_boolean(self, p):
         '''assignation : boolean'''
         logging.debug('assignation with boolean')     
-        self.moteur.inputFact(p[1])   
+        p[0] = p[1]
         return p
 
     def p_value_enum(self, p):
@@ -76,6 +85,62 @@ class CustomParser(object):
         '''argument : MOT
                     | STRING'''
         p[0] = [p[1]]
+        return p
+
+    def p_comparateur_equal(self, p):
+        '''comparateur : EQUALITY'''
+        p[0] = OperatorTypes.EQUALS
+        return p
+   
+    def p_comparateur_greater(self, p):
+        '''comparateur : GREATER'''
+        p[0] = OperatorTypes.GREATER
+        return p
+
+    def p_comparateur_greaterOrEqual(self, p):
+        '''comparateur : GREATER_EQUAL'''
+        p[0] = OperatorTypes.GREATER_OR_EQUAL
+        return p
+
+    def p_comparateur_less(self, p):
+        '''comparateur : LESS'''
+        p[0] = OperatorTypes.LESS
+        return p
+        
+    def p_comparateur_lessOrEqual(self, p):
+        '''comparateur : LESS_EQUAL'''
+        p[0] = OperatorTypes.LESS_OR_EQUAL
+        return p
+
+    # def p_contrainte_neg(self, p):
+    #     '''contrainte : NON contrainte'''
+    #     contrainte = p[2]
+    #     contrainte.positive = not contrainte.positive
+    #     p[0] = contrainte
+    #     return p
+
+    def p_consequence_seul(self, p):
+        '''consequence : assignation'''
+        p[0] = [p[1]]
+        logging.debug("consequence detected")
+        return p
+    
+    def p_consequence_suite(self,p):
+        '''consequence : assignation ET consequence'''
+        p[0] = p[1] + p[3]
+        return p
+
+    def p_contrainte_bool(self,p):
+        '''contrainte : boolean'''
+        p[0] = Constraint(p[1], OperatorTypes.EQUALS)
+        return p 
+    
+    def p_contrainte_value(self,p):
+        '''contrainte : MOT comparateur value'''
+        logging.debug("contrainte detected")
+        value = p[3]
+        value.name = p[1]
+        p[0] = Constraint(value, p[2])
         return p
 
     def p_arguments_ordonnes(self, p):
@@ -101,16 +166,17 @@ class CustomParser(object):
     #     return p 
 
     def p_regle(self, p):
-        '''regle : MOT DEUX_POINTS premisse IMPLIQUE premisse'''
+        '''regle : MOT DEUX_POINTS premisse IMPLIQUE consequence'''
         p[0] = ConcreteRule(p[3], p[5], p[1])
         logging.debug(f'regle détecté : {p[0]}')
+        return p
 
-        try:
-            self.moteur.inputRule(p[0])
-        except RuleCoherenceException as r:
-            logging.error(r)
-            return None
-        return p 
+        # try:
+        #     self.moteur.inputRule(p[0])
+        # except RuleCoherenceException as r:
+        #     logging.error(r)
+        #     return None
+        # return p 
 
 
     def p_metaregle_ordonne(self, p):
@@ -121,14 +187,14 @@ class CustomParser(object):
         return p
 
     def p_premisse_mult(self, p):
-        'premisse : boolean ET premisse'
+        'premisse : contrainte ET premisse'
 
         p[0] = [p[1]] + p[3]
         logging.debug('premisse mult détectée ')
         return p 
 
     def p_premisse_seul(self, p):
-        'premisse : boolean'
+        'premisse : contrainte'
         p[0] = [p[1]]
         logging.debug('premisse seule détecté ')
         return p 

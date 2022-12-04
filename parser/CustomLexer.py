@@ -5,7 +5,10 @@ reserved = {'ET': 'ET', 'NON': 'NON'}
 
 class CustomLexer(object):
     tokens = [
-        'NUMBER', 'IMPLIQUE', 'OPEN_PAR', 'CLOSE_PAR', 'COMMA', 'DEUX_POINTS', 'OPEN_BRACK', 'CLOSE_BRACK', 'STRING', 'GREATER', 'EQUALS', 'MOT', 'ID'
+        'NUMBER', 'IMPLIQUE', 'OPEN_PAR', 'CLOSE_PAR', 'COMMA', 'DEUX_POINTS', 
+        'LESS', 'GREATER_EQUAL', 'LESS_EQUAL', 
+        'OPEN_BRACK', 'CLOSE_BRACK', 'STRING', 'GREATER', 'EQUALS', 'EQUALITY', 
+        'MOT', 'ID'
     ] + list(reserved.values())
 
 
@@ -20,6 +23,10 @@ class CustomLexer(object):
     t_CLOSE_BRACK = r'\]'
     t_GREATER = r'>'
     t_EQUALS = r'='
+    t_EQUALITY = r'=='
+    t_GREATER_EQUAL = r'>='
+    t_LESS = r'<'
+    t_LESS_EQUAL = r'<='
 
 
     def t_NUMBER(self, t):
