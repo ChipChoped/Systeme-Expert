@@ -3,7 +3,7 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import Element, ConcreteRule, Boolean
+from Datatypes import Element, ConcreteRule, Boolean, EnumElem
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -26,7 +26,7 @@ def test_backward_chaining(base_context):
     assert hypotheses == right_hypotheses
 
 
-def test_forward_chaining(base_context):
+def test_forward_chaining_boolean(base_context):
     base_context.parser.parse('load("ressources/ex2")')
     added_facts, used_rules = base_context.moteur.chainageAvant(
         [Boolean('BondChampagne', True), Boolean('ChateauEarl', True), Boolean('HonestHenryAppleWine', True), Boolean('ToeLakesRose', True), Boolean('DosEquis', True),
@@ -38,7 +38,7 @@ def test_forward_chaining(base_context):
     # print("used_rules :")
     # print(used_rules)
 
-    print(base_context.moteur.context.rules)
+    # print(base_context.moteur.context.rules)
 
     
     right_added_facts = [Boolean('Wine', True), Boolean('CheapWine', True), Boolean('HonestHenryAppleWine', True)]
@@ -47,3 +47,23 @@ def test_forward_chaining(base_context):
     assert added_facts == right_added_facts
     assert used_rules == rights_used_rules
 
+def test_forward_chaining_enum(base_context):
+    base_context.parser.parse('load("ressources/ex2_zp")')
+    added_facts, used_rules = base_context.moteur.chainageAvant(
+        [Boolean('BondChampagne', True), Boolean('ChateauEarl', True), Boolean('HonestHenryAppleWine', True), Boolean('ToeLakesRose', True), Boolean('DosEquis', True),
+            Boolean('Coors', True), Boolean('Glops', True), Boolean('CarrotJuice', True), Boolean('Water', True)])
+    
+    # print("added facts : ")
+    # print(added_facts)
+
+    # print("used_rules :")
+    # print(used_rules)
+
+    # print(base_context.moteur.context.rules)
+
+    
+    right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage','CheapWine'), Boolean('HonestHenryAppleWine', True)]
+    rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3']]
+    
+    assert added_facts == right_added_facts
+    assert used_rules == rights_used_rules

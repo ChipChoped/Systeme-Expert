@@ -1,0 +1,21 @@
+B1 : chosenBeverage == ExpWine ET fete == NewYearsEve => BondChampagne
+B2 : chosenBeverage == ExpWine ET course == Steak => ChateauEarl
+B3 : chosenBeverage == CheapWine ET entree == Chicken ET NON GuestWellLiked => HonestHenryAppleWine
+B4 : chosenBeverage == CheapWine ET entree == Unknown => ToeLakesRose
+B5 : chosenBeverage == Beer ET entree == Mexican => DosEquis
+B6 : chosenBeverage == Beer => Coors
+BeerRules : [B5 > B6]
+B7 : guest == HealthNut => Glops
+B8 : guest == HealthNut ET NON CarrotsToBeServed => CarrotJuice
+B9 : Wine ET guest == ToImpress => chosenBeverage = ExpWine
+B10 : Wine => chosenBeverage = CheapWine
+B11 : guest == Sophisticated => Wine
+WineRules : [B9 > B10]
+B12 : entree == Mexican => BeerIndicated
+B13 : NON GuestWellLiked ET entree == DeadWish => chosenBeverage = Beer
+B14 : True => Water
+True
+NON GuestWellLiked
+guest = sophisticated
+fete = NewYearsEve
+entree = chicken
