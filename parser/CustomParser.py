@@ -27,10 +27,9 @@ class CustomParser(object):
         hypotheses_vraies = self.moteur.chainageArriere(args)
         print(f'Right hypotheses : {hypotheses_vraies}')
 
-
     def p_statement(self, p):
         '''statement : regle
-                    | fait
+                    | assignation
                     | fonction
                     | metaregle'''         
 
@@ -47,6 +46,25 @@ class CustomParser(object):
 
         logging.debug(f'fonction détectée !')
 
+    def p_assignation_value(self,p):
+        '''assignation : MOT EQUALS value'''
+        logging.debug('assignation with value')        
+        return p
+ 
+    def p_assignation_boolean(self, p):
+        '''assignation : '''
+        logging.debug('assignation with boolean')        
+        return p
+
+    def p_value_enum(self, p):
+        '''value : MOT'''
+        logging.debug('enum')        
+        return p
+
+    def p_value_number(self, p):
+        '''value : NUMBER'''
+        logging.debug('number')        
+        return p
 
     def p_argument_seul(self, p):
         '''argument : MOT
@@ -100,13 +118,13 @@ class CustomParser(object):
         'premisse : element ET premisse'
 
         p[0] = [p[1]] + p[3]
-        # logging.debug('premisse mult détectée ')
+        logging.debug('premisse mult détectée ')
         return p 
 
     def p_premisse_seul(self, p):
         'premisse : element'
         p[0] = [p[1]]
-        # logging.debug('premisse seule détecté ')
+        logging.debug('premisse seule détecté ')
         return p 
 
     def p_element_negative(self, p):
@@ -122,6 +140,10 @@ class CustomParser(object):
         p[0] = Element(p[1], True)
         # logging.debug(f'element positif [{p[1]}] detecte')
         return p
+
+    def p_error(self, p):
+        print("Syntax error in input!")
+        print(p)
 
     def __init__(self, moteur : Moteur):
         self.tokens = CustomLexer.tokens
