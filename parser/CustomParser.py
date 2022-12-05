@@ -68,17 +68,38 @@ class CustomParser(object):
         p[0] = p[1]
         return p
 
+    def p_enum_list_seul(self,p):
+        '''enum_list : boolean'''
+        p[0] = EnumElem("",{p[1].name : p[1]})
+        return p
+
+    def p_enum_list_many(self,p):
+        '''enum_list : boolean COMMA enum_list'''
+        p[0] = p[3]
+        if not p[0].override(p[1]):
+            raise FactCoherenceException("This enumeration is not coherent")
+        return p
+
+    def p_enum_with_list(self,p):
+        '''enum : OPEN_BRACK enum_list CLOSE_BRACK'''
+        p[0] = p[2]
+        return p
+
+    def p_enum_seul(self, p):
+        '''enum : boolean'''
+        p[0] = EnumElem(p[1].name, {p[1].name : p[1]})
+        return p
+
     def p_value_enum(self, p):
-        '''value : MOT'''
+        '''value : enum'''
         logging.debug('enum')  
-        p[0] = EnumElem("",p[1])      
+        p[0] = p[1]      
         return p
 
     def p_value_number(self, p):
         '''value : NUMBER'''
         logging.debug('number')
-        p[0] = Number("",p[1])      
-    
+        p[0] = Number("",p[1])    
         return p
 
     def p_argument_seul(self, p):

@@ -49,17 +49,28 @@ def test_number_conflict():
     assert not b1.conflict(b2)
 
 def test_enum_conflict():
-    b1 = EnumElem("test", "hello")
-    b2 = EnumElem("test", "hella")
+    b1 = EnumElem("test", {"hello" :Boolean("hello",True)})
+    b2 = EnumElem("test", {"hello" :Boolean("hello",False)})
     assert b1.conflict(b2)
 
-    b1 = EnumElem("test", "salut")
-    b2 = EnumElem("test", "salut")
+    b1 = EnumElem("test", {"hello" :Boolean("hello",True)})
+    b2 = EnumElem("test", {"hello" :Boolean("hello",True)})
     assert not b1.conflict(b2)
     
-    b1 = EnumElem("test", "salut")
-    b2 = EnumElem("tet", "hello")
+    b1 = EnumElem("test", {'hello' : Boolean("hello",True)})
+    b2 = EnumElem("tet", {'hello' : Boolean("hello",False)})
     assert not b1.conflict(b2)
+
+    
+    assert not b1.override(Boolean("hello",False))
+
+    
+
+def test_enum_equal():
+    e1 = EnumElem("name", {"truc1" :Boolean("truc1", True), "truc2" : Boolean("truc2", False)})
+    e2 = EnumElem("name", {"truc1" :Boolean("truc1", True), "truc2" : Boolean("truc2", False), "truc3" : Boolean("truc3", False)})
+
+    assert e2.equal(e1)
 
 def test_variable_type():
     assert VariableTypes.BOOLEAN != VariableTypes.NUMBER
@@ -87,6 +98,10 @@ def test_contraint_bool_validity():
 
     b3 = Boolean("encore_autre", False)
     assert not c1.satisfy(b3)
+
+def test_contraint_enum_validity():
+    c1 = Constraint(EnumElem("name", {"truc1" :Boolean("truc1", True), "truc2" : Boolean("truc2", False)}), OperatorTypes.EQUALS)
+    assert c1.satisfy(EnumElem("name", {"truc1" :Boolean("truc1", True), "truc2" : Boolean("truc2", False), "truc3" : Boolean("truc3", False)}))
 
 def test_contraint_number_validity():
     c1 = Constraint(Number("name", 3), OperatorTypes.EQUALS)

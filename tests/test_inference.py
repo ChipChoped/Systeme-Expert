@@ -53,16 +53,16 @@ def test_forward_chaining_enum(base_context):
         [Boolean('BondChampagne', True), Boolean('ChateauEarl', True), Boolean('HonestHenryAppleWine', True), Boolean('ToeLakesRose', True), Boolean('DosEquis', True),
             Boolean('Coors', True), Boolean('Glops', True), Boolean('CarrotJuice', True), Boolean('Water', True)])
     
-    # print("added facts : ")
-    # print(added_facts)
+    print("added facts : ")
+    print(added_facts)
 
-    # print("used_rules :")
-    # print(used_rules)
+    print("used_rules :")
+    print(used_rules)
 
     # print(base_context.moteur.context.rules)
 
     
-    right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage','CheapWine'), Boolean('HonestHenryAppleWine', True)]
+    right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage', {'CheapWine' : Boolean('CheapWine', True)}), Boolean('HonestHenryAppleWine', True)]
     rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3']]
     
     assert added_facts == right_added_facts

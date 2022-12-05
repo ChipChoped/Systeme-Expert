@@ -16,6 +16,6 @@ B13 : NON GuestWellLiked ET entree == DeadWish => chosenBeverage = Beer
 B14 : True => Water
 True
 NON GuestWellLiked
-guest = sophisticated
+guest = Sophisticated
 fete = NewYearsEve
-entree = chicken
+entree = Chicken

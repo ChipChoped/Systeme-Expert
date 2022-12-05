@@ -11,13 +11,16 @@ class Context(object):
         self.facts : dict[Element] = dict()
         self.rules : dict[Rule] = dict()
 
-    def addFact(self, fact : Element):
+    def addFact(self, fact : Element)-> None:
         check_fact : Element | None = self.facts.get(fact.name) 
-        
-        if check_fact is not None and fact.conflict(check_fact):
-            raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
-        self.BindType(fact)
-        self.facts[fact.name] = fact
+
+        if check_fact is not None:
+            self.checkTypeCoherence(check_fact)
+            if not check_fact.override(fact.value):
+                raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
+        else:
+            self.BindType(fact)
+            self.facts[fact.name] = fact
 
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):

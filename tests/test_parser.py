@@ -3,7 +3,7 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import Element, ConcreteRule
+from Datatypes import Element, ConcreteRule , EnumElem, Boolean
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -18,5 +18,6 @@ def base_context():
 
 
 def test_assignation(base_context):
-    pass    
+    base_context.parser.parse("a = [test, NON truc]")
+    base_context.moteur.context.facts['a'] == EnumElem('a', [Boolean('test', True), Boolean('truc', False)])
 

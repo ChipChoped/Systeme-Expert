@@ -37,6 +37,11 @@ class Element(ABC):
     def __str__(self) -> str:
         pass
 
+    def override(self, value) -> bool:
+        '''Essaie d'ajouter une valeur / de modifier l'actuelle
+        Renvoi True si possible'''
+        return False
+
     @abstractclassmethod
     def str_condensed(self)->str:
         pass
@@ -98,7 +103,8 @@ class Number(Element):
     __repr__ = __str__
  
 class EnumElem(Element):
-    def __init__(self, name : str, value : str):
+    def __init__(self, name : str, value : dict[Boolean]):
+        
         super().__init__(name, value, VariableTypes.ENUM)
     
     def __str__(self):
@@ -106,6 +112,31 @@ class EnumElem(Element):
     
     def str_condensed(self)->str:
         return f'{self.name}[{self.value}]'
+    
+    def conflict(self, value : Element) -> bool:
+        if value.type == VariableTypes.ENUM:
+            return self.name == value.name and any([self.conflict(elem) for elem in list(value.value.values())])
+        elif value.type == VariableTypes.BOOLEAN:
+            return self.value.get(value.name) is not None and self.value.get(value.name).conflict(value)
+        else:
+            return False
+    
+    def override(self, value : Element) -> bool:
+        if self.conflict(value):
+            return False
+        elif value.type == VariableTypes.BOOLEAN:
+            self.value[value.name] = value
+            return True
+        elif value.type == VariableTypes.EnumElem:
+            self.value.update(value)
+            return True
+        else:
+            return False
+    
+    def equal(self, element : EnumElem) -> bool:
+        """l'autre enum est un subset de celle-ci"""
+        return element.type == self.type and all([self.value.get(elem.name) is not None and self.value.get(elem.name) == elem for elem in list(element.value.values())])
+
     
     __repr__ = __str__
 
