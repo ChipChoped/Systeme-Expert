@@ -127,8 +127,8 @@ class EnumElem(Element):
         elif value.type == VariableTypes.BOOLEAN:
             self.value[value.name] = value
             return True
-        elif value.type == VariableTypes.EnumElem:
-            self.value.update(value)
+        elif value.type == VariableTypes.ENUM:
+            self.value.update(value.value)
             return True
         else:
             return False

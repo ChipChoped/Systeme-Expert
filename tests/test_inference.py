@@ -49,17 +49,16 @@ def test_forward_chaining_boolean(base_context):
 
 def test_forward_chaining_enum(base_context):
     base_context.parser.parse('load("ressources/ex2_zp")')
-    added_facts, used_rules = base_context.moteur.chainageAvant(
-        [Boolean('BondChampagne', True), Boolean('ChateauEarl', True), Boolean('HonestHenryAppleWine', True), Boolean('ToeLakesRose', True), Boolean('DosEquis', True),
-            Boolean('Coors', True), Boolean('Glops', True), Boolean('CarrotJuice', True), Boolean('Water', True)])
+    added_facts, used_rules = base_context.moteur.chainageAvant()
     
     print("added facts : ")
     print(added_facts)
 
-    print("used_rules :")
-    print(used_rules)
+    # print("used_rules :")
+    # print(used_rules)
 
-    # print(base_context.moteur.context.rules)
+    print("context :")
+    print(base_context.moteur.context)
 
     
     right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage', {'CheapWine' : Boolean('CheapWine', True)}), Boolean('HonestHenryAppleWine', True)]

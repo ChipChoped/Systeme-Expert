@@ -27,7 +27,7 @@ class Moteur(object):
         self.context.addMetarule(rule_name, rule_list, sorted)
 
     #sature les rêgles afin de déduire la plus grande base de faits possible
-    def chainageAvant(self, objectives : list[Element]):
+    def chainageAvant(self, objectives : list[Element] = []):
         regles_utilises : list[Rule] = list()
         faits_ajoutes : list[Fact] = list()
         # return_context : Context = Context()

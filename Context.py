@@ -16,7 +16,7 @@ class Context(object):
 
         if check_fact is not None:
             self.checkTypeCoherence(check_fact)
-            if not check_fact.override(fact.value):
+            if not check_fact.override(fact):
                 raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
         else:
             self.BindType(fact)
