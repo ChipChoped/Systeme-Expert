@@ -52,24 +52,19 @@ def test_forward_chaining_boolean(base_context):
 
 def test_forward_chaining_enum_no_objective(base_context):
     base_context.parser.parse('load("ressources/ex2_zp")')
-    context = base_context.moteur.chainageAvant()
+
+    print("base context :")
+    print(base_context.moteur.context)
+    
+    context = base_context.moteur.chainageAvant(base_context.moteur.context.hypothesis["H1"])
 
     print("added context :")
     print(context)
 
-    # print("added facts : ")
-    # print(added_facts)
-
-    # # print("used_rules :")
-    # # print(used_rules)
-
-    # print("context :")
-    print(base_context.moteur.context)
-
-    
-    right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage', {'CheapWine' : Boolean('CheapWine', True)}), Boolean('HonestHenryAppleWine', True)]
-    rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3'],
-    base_context.moteur.context.rules['B13'], base_context.moteur.context.rules['BeerRules'].rule_list[2], base_context.moteur.context.rules['B14']]
-    
-    assert added_facts == right_added_facts
-    assert used_rules == rights_used_rules
+    moteur_correction = Moteur(Context())
+    lexer_correction = CustomLexer().lexer
+    correction = CustomParser(moteur_correction)
+    correction.parser.parse('load("ressources/ex2_zp_final_context")')
+        
+    assert context.facts == correction.moteur.context.facts
+    assert context.rules == correction.moteur.context.rules

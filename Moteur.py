@@ -1,5 +1,6 @@
 from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes
 from Context import Context
+import logging
 import copy
 
 #TODO : résoudre le cassage du chainage avant
@@ -33,15 +34,17 @@ class Moteur(object):
     def chainageAvant(self, objectives : Hypothesis) -> Context:
 
         if objectives is None : 
+            logging.warning("No objective was given")
             objectives = Hypothesis("default", [Constraint(Boolean("unsatisfiable_default_constraint", True), VariableTypes)])
 
-        regles_utilises : list[Rule] = list()
-        faits_ajoutes : list[Fact] = list()
 
         return_context : Context = Context()
-        
 
         simulation_context : Context = copy.deepcopy(self.context)
+        print("simulation context :")
+        print(simulation_context)
+        print("return_context :")
+        print(return_context)
 
         res = True
         while simulation_context.rules.values() != [] and res and not objectives.satisfy(simulation_context.facts):
@@ -49,12 +52,14 @@ class Moteur(object):
             if ajout is None:
                 res = False
             else :
-
-                [(simulation_context.addFact(fact) , return_context.addFact(fact)) for fact in ajout[0].consequence]
-                simulation_context.rules.pop(ajout[1])
+                [(simulation_context.addFact(copy.copy(fact)) , return_context.addFact(copy.copy(fact))) for fact in ajout[0].consequence]
                 return_context.addRule(ajout[0])
-                regles_utilises.append(ajout[0])
-                
+                simulation_context.rules.pop(ajout[1])
+            
+            print("simulation context :")
+            print(simulation_context)
+            print("return_context :")
+            print(return_context)
 
         return return_context
 
