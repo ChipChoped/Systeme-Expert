@@ -27,10 +27,12 @@ class Moteur(object):
         self.context.addMetarule(rule_name, rule_list, sorted)
 
     #sature les rêgles afin de déduire la plus grande base de faits possible
-    def chainageAvant(self, objectives : list[Element] = []):
+    def chainageAvant(self, objectives : list[Element] = []) -> Context:
+
         regles_utilises : list[Rule] = list()
         faits_ajoutes : list[Fact] = list()
-        # return_context : Context = Context()
+
+        return_context : Context = Context()
         
         # objectives = [Element(objective, True) for objective in objectives]
 
@@ -44,12 +46,16 @@ class Moteur(object):
             else :
                 # [self.context.addFact(f) for f in ajout_regle[1]]
                 print("ajout : " + str(ajout))
-                faits_ajoutes.extend(ajout[0].consequence)
-                [simulation_context.addFact(fact) for fact in ajout[0].consequence]
-                simulation_context.rules.pop(ajout[1])
-                regles_utilises.append(ajout[0])
 
-        return (faits_ajoutes, regles_utilises)
+                # faits_ajoutes.extend(ajout[0].consequence)
+
+                [(simulation_context.addFact(fact) , return_context.addFact(fact)) for fact in ajout[0].consequence]
+                simulation_context.rules.pop(ajout[1])
+                return_context.addRule(ajout[0])
+                regles_utilises.append(ajout[0])
+                
+
+        return return_context
 
     # cherche une rêgle afin d'étendre la base de faits
     # renvoie un tuple (index_regle, [faits_deduits]) ou None

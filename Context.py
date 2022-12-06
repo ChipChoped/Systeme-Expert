@@ -1,4 +1,4 @@
-from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes
+from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes, Boolean
 from CoherenceExceptions import *
 import logging
 import collections
@@ -7,8 +7,8 @@ import collections
 class Context(object):
 
     def __init__(self):
-        self.type_binding : dict[VariableTypes] = dict()
-        self.facts : dict[Element] = dict()
+        self.type_binding : dict[VariableTypes] = {'True' : VariableTypes.BOOLEAN}
+        self.facts : dict[Element] = {'True' : Boolean('True', True)}
         self.rules : dict[Rule] = dict()
 
     def addFact(self, fact : Element)-> None:

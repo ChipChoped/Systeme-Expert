@@ -37,10 +37,14 @@ class Element(ABC):
     def __str__(self) -> str:
         pass
 
-    def override(self, value) -> bool:
+    def override(self, elem : Element) -> bool:
         '''Essaie d'ajouter une valeur / de modifier l'actuelle
         Renvoi True si possible'''
-        return False
+        if not self.conflict(elem):
+            self.value = elem.value
+            return True
+        else :
+            return False
 
     @abstractclassmethod
     def str_condensed(self)->str:

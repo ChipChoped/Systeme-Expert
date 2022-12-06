@@ -47,22 +47,26 @@ def test_forward_chaining_boolean(base_context):
     assert added_facts == right_added_facts
     assert used_rules == rights_used_rules
 
-def test_forward_chaining_enum(base_context):
+def test_forward_chaining_enum_no_objective(base_context):
     base_context.parser.parse('load("ressources/ex2_zp")')
-    added_facts, used_rules = base_context.moteur.chainageAvant()
-    
-    print("added facts : ")
-    print(added_facts)
+    context = base_context.moteur.chainageAvant()
 
-    # print("used_rules :")
-    # print(used_rules)
+    print("added context :")
+    print(context)
 
-    print("context :")
+    # print("added facts : ")
+    # print(added_facts)
+
+    # # print("used_rules :")
+    # # print(used_rules)
+
+    # print("context :")
     print(base_context.moteur.context)
 
     
     right_added_facts = [Boolean('Wine', True), EnumElem('chosenBeverage', {'CheapWine' : Boolean('CheapWine', True)}), Boolean('HonestHenryAppleWine', True)]
-    rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3']]
+    rights_used_rules = [base_context.moteur.context.rules['B11'], base_context.moteur.context.rules['WineRules'].rule_list[1], base_context.moteur.context.rules['B3'],
+    base_context.moteur.context.rules['B13'], base_context.moteur.context.rules['BeerRules'].rule_list[2], base_context.moteur.context.rules['B14']]
     
     assert added_facts == right_added_facts
     assert used_rules == rights_used_rules
