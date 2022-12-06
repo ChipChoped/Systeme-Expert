@@ -81,6 +81,19 @@ class Boolean(Element):
     
     __repr__ = __str__
 
+class Hypothesis:
+    def __init__(self, name : str, rules : list[ConcreteRule]):
+        self.name = name
+        self.rules = rules
+    
+    def satisfy(self, facts : dict[Element])->bool:
+        return any([rule.satisfy(facts) for rule in self.rules])
+
+    def __str__(self):
+        return f"<Hyp {self.name}" +(', '.join([str(elem) for elem in self.rules]))+ ">"
+
+    __repr__ = __str__
+
 
 class Number(Element):
     def __init__(self, name : str, value : int | float):

@@ -1,7 +1,8 @@
 from parser.CustomLexer import CustomLexer
 from CoherenceExceptions import RuleCoherenceException
-from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem, Constraint, OperatorTypes
+from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem, Constraint, OperatorTypes, Hypothesis
 from Moteur import Moteur
+from ParsingException import *
 import ply.yacc as yacc
 import logging
 
@@ -17,10 +18,17 @@ class CustomParser(object):
     def c_context(self, *args):
         print(self.moteur.context)
 
-    def c_forward(self, *args):
+    def c_forward(self, hypothese_used, *args):
         print("chainage avant, avec pour but : "+str(args))
-        faits_ajoutes, regles_utilises = self.moteur.chainageAvant(args)
-        print(f'Added facts : {faits_ajoutes}, used rules : {regles_utilises}')
+
+        hypothese = self.moteur.context.hypothesis.get(hypothese_used)
+
+        if hypothese is None:
+            raise MissingArguments("L'Hypothèse entrée en paramètre n'existe pas")
+    
+        contexte_ajoute = self.moteur.chainageAvant(hypothese)
+        print(f'Context ajouté : {contexte_ajoute}')
+        
 
     def c_backward(self, *args):
         print("chainage arrière, avec pour hypothèses : " + str(args))
@@ -28,7 +36,8 @@ class CustomParser(object):
         print(f'Right hypotheses : {hypotheses_vraies}')
 
     def p_statement(self, p):
-        '''statement : fonction
+        '''statement : 
+                    | fonction
                     | metaregle'''         
 
     def p_statement_assignation(self, p):
@@ -40,6 +49,12 @@ class CustomParser(object):
         ''' statement : regle '''
         self.moteur.inputRule(p[1])
         return p
+    
+    def p_statement_hypothese(self, p):
+        '''statement : hypothese'''
+        self.moteur.inputHypothesis(p[1])
+        return p
+
 
     def p_fonction_arg(self, p):
         '''fonction : MOT OPEN_PAR argument CLOSE_PAR'''
@@ -185,6 +200,22 @@ class CustomParser(object):
         
     #     self.moteur.inputFact(p[1])
     #     return p 
+
+    def p_hypothese(self, p):
+        '''hypothese : MOT DEUX_POINTS hypothese_contenu'''
+        p[0] = Hypothesis(p[1], p[3])
+        return p[0]
+
+    def p_hypothese_contenu_alone(self,p):
+        '''hypothese_contenu : premisse'''
+        logging.debug(f'Hypothèse détectée')
+        p[0] = [ConcreteRule(p[1], [], "")]
+        return p 
+    
+    def p_hypothese_contenu_mult(self, p):
+        '''hypothese_contenu : premisse COMMA hypothese_contenu'''
+        p[0] = [ConcreteRule(p[1], [], "")] + p[3]
+        return p
 
     def p_regle(self, p):
         '''regle : MOT DEUX_POINTS premisse IMPLIQUE consequence'''

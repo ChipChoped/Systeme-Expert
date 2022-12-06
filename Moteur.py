@@ -1,4 +1,4 @@
-from Datatypes import Element, Rule, ConcreteRule
+from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes
 from Context import Context
 import copy
 
@@ -22,32 +22,33 @@ class Moteur(object):
         #     logging.error(r)
         #     self.rules.pop()
 
+    def inputHypothesis(self, hypothese : Hypothesis):
+        self.context.addHypothesis(hypothese)
+
     #crée une metaregle à partir de son nom et du nom de ses rêgles
     def createMetarule(self, rule_name : str, rule_list : list[str], sorted : bool = True):
         self.context.addMetarule(rule_name, rule_list, sorted)
 
     #sature les rêgles afin de déduire la plus grande base de faits possible
-    def chainageAvant(self, objectives : list[Element] = []) -> Context:
+    def chainageAvant(self, objectives : Hypothesis) -> Context:
+
+        if objectives is None : 
+            objectives = Hypothesis("default", [Constraint(Boolean("unsatisfiable_default_constraint", True), VariableTypes)])
 
         regles_utilises : list[Rule] = list()
         faits_ajoutes : list[Fact] = list()
 
         return_context : Context = Context()
         
-        # objectives = [Element(objective, True) for objective in objectives]
 
         simulation_context : Context = copy.deepcopy(self.context)
 
         res = True
-        while simulation_context.rules.values() != [] and res and not any([objective in list(simulation_context.facts.values()) for objective in objectives]):
+        while simulation_context.rules.values() != [] and res and not objectives.satisfy(simulation_context.facts):
             ajout  = Moteur.trouverCorrespondanceRegle(simulation_context.facts ,list(simulation_context.rules.values()))
             if ajout is None:
                 res = False
             else :
-                # [self.context.addFact(f) for f in ajout_regle[1]]
-                print("ajout : " + str(ajout))
-
-                # faits_ajoutes.extend(ajout[0].consequence)
 
                 [(simulation_context.addFact(fact) , return_context.addFact(fact)) for fact in ajout[0].consequence]
                 simulation_context.rules.pop(ajout[1])

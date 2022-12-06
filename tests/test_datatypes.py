@@ -3,7 +3,7 @@ import pytest
 
 from Moteur import Moteur
 from Context import Context
-from Datatypes import OperatorTypes, Constraint, Element, ConcreteRule, Boolean, Number, EnumElem, VariableTypes
+from Datatypes import *
 from parser.CustomLexer import CustomLexer
 from parser.CustomParser import CustomParser
 
@@ -120,3 +120,20 @@ def test_constraint_satisfiable():
     
     facts = {"truc" : Number("truc", 3),"name" : Number("name",4)}
     assert not c1.satisfiable(facts)
+
+
+def test_hypothesis_satisfiable():
+    c1 = Constraint(Number("name", 3), OperatorTypes.EQUALS)
+    c2 = Constraint(Boolean("AutreBool", False), OperatorTypes.EQUALS)
+    
+    r1 = ConcreteRule([c1],[], "")
+    r2 = ConcreteRule([c2],[], "")
+    r3 = ConcreteRule([c1, c2],[], "")
+
+    h1 = Hypothesis("h1", [r1, r2])
+    facts = {"truc" : Number("truc", 3),"name" : Number("name",3)}
+    assert h1.satisfy(facts)
+    
+    h2 = Hypothesis("h2", [r3])
+    facts = {"truc" : Number("truc", 3),"name" : Number("name",4)}
+    assert not h2.satisfy(facts)

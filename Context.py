@@ -1,4 +1,4 @@
-from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes, Boolean
+from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes, Boolean, Hypothesis
 from CoherenceExceptions import *
 import logging
 import collections
@@ -10,6 +10,7 @@ class Context(object):
         self.type_binding : dict[VariableTypes] = {'True' : VariableTypes.BOOLEAN}
         self.facts : dict[Element] = {'True' : Boolean('True', True)}
         self.rules : dict[Rule] = dict()
+        self.hypothesis : dict[Hypothesis] = dict()
 
     def addFact(self, fact : Element)-> None:
         check_fact : Element | None = self.facts.get(fact.name) 
@@ -19,19 +20,22 @@ class Context(object):
             if not check_fact.override(fact):
                 raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
         else:
-            self.BindType(fact)
+            self.bindType(fact)
             self.facts[fact.name] = fact
+    
+    def addHypothesis(self, hypothesis : Hypothesis) -> None:
+        [self.checkTypeCoherenceRule(rule) for rule in hypothesis.rules]
+        self.hypothesis[hypothesis.name] = hypothesis
+
+
 
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):
         if rule in self.rules.values():
             raise RuleCoherenceException("duplicate rules found")
         
-        [self.checkTypeCoherence(constraint.elem) for constraint in rule.premisse]
-        [self.checkTypeCoherence(elem) for elem in rule.consequence]
-
-        [self.BindType(constraint.elem) for constraint in rule.premisse]
-        [self.BindType(elem) for elem in rule.consequence]
+        self.checkTypeCoherenceRule(rule)
+        self.bindTypeRule(rule)
         
         self.rules[rule.name] = rule
     
@@ -52,7 +56,7 @@ class Context(object):
         self.rules[meta_rule_name] = meta_rule
         [self.rules.pop(rule_name) for rule_name in rule_list]
 
-    def BindType(self, element : Element)->None:
+    def bindType(self, element : Element)->None:
         if self.type_binding.get(element.name) is None:
             self.type_binding[element.name] = element.type
         else : self.checkTypeCoherence(element)
@@ -61,6 +65,14 @@ class Context(object):
     def checkTypeCoherence(self, element : Element):
         if self.type_binding.get(element.name) is not None and self.type_binding[element.name] != element.type:
             raise TypeCoherenceException(f'Element {element.name} already declared as {self.type_binding[element.name]}, trying to rebind it as {element.type}')
+
+    def checkTypeCoherenceRule(self, rule : ConcreteRule):
+        [self.checkTypeCoherence(constraint.elem) for constraint in rule.premisse]
+        [self.checkTypeCoherence(elem) for elem in rule.consequence]
+
+    def bindTypeRule(self, rule : ConcreteRule):
+        [self.bindType(constraint.elem) for constraint in rule.premisse]
+        [self.bindType(elem) for elem in rule.consequence]
 
 
     def checkFactBaseCoherence(self):
@@ -89,5 +101,8 @@ class Context(object):
     def __str__(self):
         ret_str = f"{len(self.facts)} faits : \n[{', '.join([str(elem) for elem in self.facts.values()])}] \n"
         ret_str = ret_str + f"{len(self.rules)} règles : \n" + \
-            '\n'.join([str(rule) for rule in self.rules.values()])
+            '\n'.join([str(rule) for rule in self.rules.values()]) + '\n'
+        ret_str += f"{len(self.hypothesis)} hypothèses : \n" + \
+            '\n'.join([str(hypothesis) for hypothesis in self.hypothesis.values()]) + '\n'
+
         return ret_str

@@ -21,3 +21,5 @@ guest = Sophisticated
 guest = NON WellLiked
 fete = NewYearsEve
 entree = Chicken
+
+H1 : chosenBeverage == BondChampagne, chosenBeverage == HonestHenryAppleWine, chosenBeverage == ToeLakesRose, chosenBeverage == DosEquis, chosenBeverage == Coors, chosenBeverage == Glops, chosenBeverage == CarrotJuice

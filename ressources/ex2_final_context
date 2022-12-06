@@ -1,0 +1,7 @@
+True
+Wine
+CheapWine
+HonestHenryAppleWine
+B11 : GuestSophisticated => Wine
+B10 : Wine => CheapWine
+B3 : CheapWine ET EntreeChicken ET NON GuestWellLiked => HonestHenryAppleWine
