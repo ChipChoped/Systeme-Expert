@@ -1,0 +1,5 @@
+B11 : guest == Sophisticated => chosenBeverage = Wine
+B10 : chosenBeverage == Wine => chosenBeverage = CheapWine
+B3 : chosenBeverage == CheapWine ET entree == Chicken ET guest == NON WellLiked => chosenBeverage = HonestHenryAppleWine
+
+chosenBeverage = [Wine, CheapWine, HonestHenryAppleWine]
