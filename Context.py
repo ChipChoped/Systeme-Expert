@@ -2,6 +2,7 @@ from Datatypes import Element, Rule, Metarule, ConcreteRule, VariableTypes, Bool
 from CoherenceExceptions import *
 import logging
 import collections
+from copy import deepcopy
 
 
 class Context(object):
@@ -15,13 +16,16 @@ class Context(object):
     def addFact(self, fact : Element)-> None:
         check_fact : Element | None = self.facts.get(fact.name) 
 
+        added_fact : Element = deepcopy(fact)
+
+
         if check_fact is not None:
             self.checkTypeCoherence(check_fact)
-            if not check_fact.override(fact):
+            if not check_fact.override(added_fact):
                 raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
         else:
-            self.bindType(fact)
-            self.facts[fact.name] = fact
+            self.bindType(added_fact)
+            self.facts[added_fact.name] = added_fact
     
     def addHypothesis(self, hypothesis : Hypothesis) -> None:
         [self.checkTypeCoherenceRule(rule) for rule in hypothesis.rules]

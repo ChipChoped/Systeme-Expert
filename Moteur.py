@@ -41,10 +41,10 @@ class Moteur(object):
         return_context : Context = Context()
 
         simulation_context : Context = copy.deepcopy(self.context)
-        print("simulation context :")
-        print(simulation_context)
-        print("return_context :")
-        print(return_context)
+        # print("simulation context :")
+        # print(simulation_context)
+        # print("return_context :")
+        # print(return_context)
 
         res = True
         while simulation_context.rules.values() != [] and res and not objectives.satisfy(simulation_context.facts):
@@ -56,10 +56,10 @@ class Moteur(object):
                 return_context.addRule(ajout[0])
                 simulation_context.rules.pop(ajout[1])
             
-            print("simulation context :")
-            print(simulation_context)
-            print("return_context :")
-            print(return_context)
+            # print("simulation context :")
+            # print(simulation_context)
+            # print("return_context :")
+            # print(return_context)
 
         return return_context
 
