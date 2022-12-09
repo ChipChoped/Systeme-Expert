@@ -89,14 +89,19 @@ class Moteur(object):
 
         simulation_context: Context = copy.deepcopy(self.context)
 
+        # liste les hypothèses
         for hypothesis in hypotheses:
+            #liste les rêgles
             for rule in list(simulation_context.rules.values()):
+                # recherche de rêgle concluante 
                 returned_rule = rule.concludes(hypothesis)
                 if returned_rule:
+                    # recherche de conflits avec la base de connaissances virtuelle
                     for fact in list(simulation_context.facts.values()):
                         if fact.conflicts(returned_rule[0].consequence):
                             break
-
+                        
+                        # application de la rêgle
                         applicable_rule = True
 
                         for premisse in returned_rule[0].premisse:
