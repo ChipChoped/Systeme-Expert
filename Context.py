@@ -3,6 +3,7 @@ from CoherenceExceptions import *
 import logging
 import collections
 from copy import deepcopy
+from typing import Optional
 
 
 class Context(object):
@@ -14,7 +15,7 @@ class Context(object):
         self.hypothesis : dict[Hypothesis] = dict()
 
     def addFact(self, fact : Element)-> None:
-        check_fact : Element | None = self.facts.get(fact.name) 
+        check_fact : Optional[Element] = self.facts.get(fact.name) 
 
         added_fact : Element = deepcopy(fact)
 

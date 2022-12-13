@@ -2,6 +2,7 @@ from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes
 from Context import Context
 import logging
 import copy
+from typing import Optional
 
 #TODO : résoudre le cassage du chainage avant
 
@@ -65,7 +66,7 @@ class Moteur(object):
 
     # cherche une rêgle afin d'étendre la base de faits
     # renvoie un tuple (index_regle, [faits_deduits]) ou None
-    def trouverCorrespondanceRegle(base_de_faits : list[Element], base_de_regles : list[Rule]) -> 'ConcreteRule | None':
+    def trouverCorrespondanceRegle(base_de_faits : list[Element], base_de_regles : list[Rule]) -> Optional[tuple[ConcreteRule, str]]:
         """Match rule"""
         for regle in base_de_regles:
             ret = regle.satisfy(base_de_faits)
