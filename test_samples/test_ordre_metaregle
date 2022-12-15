@@ -1,0 +1,16 @@
+R1 : A => B
+R3 : E => F
+R2 : C => D
+
+R5 : G => F
+R4 : A ET Z => B
+
+R7 : G => H
+R6 : A => B ET D
+
+
+MR1 : [R1, R3, R2]["ALPHA_ASC"]
+
+MR2 : [R5, R4]["PREM_ASC"]
+
+MR3 : [R7, R6]["CONS_ASC"]

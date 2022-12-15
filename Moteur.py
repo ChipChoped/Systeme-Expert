@@ -28,8 +28,8 @@ class Moteur(object):
         self.context.addHypothesis(hypothese)
 
     #crée une metaregle à partir de son nom et du nom de ses rêgles
-    def createMetarule(self, rule_name : str, rule_list : list[str], sorted : bool = True):
-        self.context.addMetarule(rule_name, rule_list, sorted)
+    def createMetarule(self, rule_name : str, rule_list : list[str], ordered : bool = False, order_type : str = ""):
+        self.context.addMetarule(rule_name, rule_list, ordered, order_type)
 
     #sature les rêgles afin de déduire la plus grande base de faits possible
     def chainageAvant(self, objectives : Hypothesis) -> Context:

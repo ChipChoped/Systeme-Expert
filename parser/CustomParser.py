@@ -1,7 +1,8 @@
 from parser.CustomLexer import CustomLexer
-from CoherenceExceptions import RuleCoherenceException
+from parser.ParserUtils import ParserAction
 from Datatypes import Boolean, Metarule, ConcreteRule, Number, EnumElem, Constraint, OperatorTypes, Hypothesis
 from Moteur import Moteur
+from CoherenceExceptions import *
 from ParsingException import *
 import ply.yacc as yacc
 import logging
@@ -11,15 +12,18 @@ import logging
 class CustomParser(object):
     
     def c_load(self, file_path, *args):
-        file : TextIoWrapper = open(file_path, "r")
-        for line in file:
-            self.parser.parse(line)
+        try:
+            file : TextIoWrapper = open(file_path, "r")
+            for line in file:
+                self.parser.parse(line)
+        except Exception as e:
+            self.handle_parsing_exception("File not found")
 
     def c_context(self, *args):
         print(self.moteur.context)
 
     def c_forward(self, hypothese_used, *args):
-        print("chainage avant, avec pour but : "+str(args))
+        print("chainage avant, avec pour but : "+str(hypothese_used))
 
         hypothese = self.moteur.context.hypothesis.get(hypothese_used)
 
@@ -35,37 +39,58 @@ class CustomParser(object):
         hypotheses_vraies = self.moteur.chainageArriere(args)
         print(f'Right hypotheses : {hypotheses_vraies}')
 
-    def p_statement(self, p):
-        '''statement : 
-                    | fonction
-                    | metaregle'''         
+
+    def p_statement_empty(self,p):
+        '''statement : '''
+        self.current_line+=1
+
+    def p_statement_function(self, p):
+        '''statement : fonction'''
+        self.current_action = ParserAction.Function
+        self.current_line+=1
+
+
+    def p_statement_metaregle(self, p):
+        '''statement : metaregle'''
+        self.current_line+=1
+
 
     def p_statement_assignation(self, p):
         '''statement : assignation'''
-        self.moteur.inputFact(p[1])     
+        self.moteur.inputFact(p[1])   
+        self.current_line+=1
         return p
 
     def p_statement_rule(self,p):
         ''' statement : regle '''
         self.moteur.inputRule(p[1])
+        self.current_line+=1
         return p
     
     def p_statement_hypothese(self, p):
         '''statement : hypothese'''
         self.moteur.inputHypothesis(p[1])
+        self.current_line+=1
         return p
 
 
     def p_fonction_arg(self, p):
         '''fonction : MOT OPEN_PAR argument CLOSE_PAR'''
-        logging.debug(f'fonction détectée !, {p[1]}')
-        fun = getattr(self, "c_"+p[1])
-        fun(*p[3])
+        try : 
+            fun = getattr(self, "c_"+p[1])
+            fun(*p[3])
+        except Exception as e: 
+            self.handle_functionNotFound_exception(e)
     
+        logging.debug(f'fonction détectée !, {p[1]}')
+
     def p_fonction_no_arg(self, p):
         '''fonction : MOT OPEN_PAR CLOSE_PAR'''
-        fun = getattr(self, "c_"+p[1])
-        fun()
+        try :
+            fun = getattr(self, "c_"+p[1])
+            fun()
+        except Exception as e: 
+            self.handle_functionNotFound_exception(e)
 
         logging.debug(f'fonction détectée !')
 
@@ -163,7 +188,7 @@ class CustomParser(object):
     
     def p_consequence_suite(self,p):
         '''consequence : assignation ET consequence'''
-        p[0] = p[1] + p[3]
+        p[0] = [p[1]] + p[3]
         return p
 
     def p_contrainte_bool(self,p):
@@ -185,8 +210,8 @@ class CustomParser(object):
         return p
 
     def p_argument_ordonne_seul(self, p):
-        '''ordonnes : MOT '''
-        p[0] = [p[1]]
+        '''ordonnes : MOT GREATER MOT'''
+        p[0] = [p[1], p[3]]
         return p
 
     def p_ensemble_arguments(self, p):
@@ -203,6 +228,7 @@ class CustomParser(object):
 
     def p_hypothese(self, p):
         '''hypothese : MOT DEUX_POINTS hypothese_contenu'''
+        self.current_action.Hypothese
         p[0] = Hypothesis(p[1], p[3])
         return p[0]
 
@@ -219,6 +245,7 @@ class CustomParser(object):
 
     def p_regle(self, p):
         '''regle : MOT DEUX_POINTS premisse IMPLIQUE consequence'''
+        self.current_action.Rule
         p[0] = ConcreteRule(p[3], p[5], p[1])
         logging.debug(f'regle détecté : {p[0]}')
         return p
@@ -231,11 +258,30 @@ class CustomParser(object):
         # return p 
 
 
-    def p_metaregle_ordonne(self, p):
+    def p_metaregle_exclusive_ordonne(self, p):
         '''metaregle : MOT DEUX_POINTS OPEN_BRACK ordonnes CLOSE_BRACK'''
         logging.debug(f'Metaregle détectée : {p[1]}, {p[4]}')
+        self.current_action.MetaRule
         meta : Metarule
-        self.moteur.createMetarule(p[1], p[4], True)
+        self.moteur.createMetarule(p[1], p[4], False)
+        return p
+
+    def p_metaregle_exclusive_non_ordonnee(self, p):
+        '''metaregle : MOT DEUX_POINTS OPEN_BRACK liste_mots CLOSE_BRACK OPEN_BRACK STRING CLOSE_BRACK'''
+        self.current_action.MetaRule
+        meta : Metarule
+        self.moteur.createMetarule(p[1], p[4], True, p[7])
+        return p
+
+
+    def p_liste_mots_seul(self,p):
+        '''liste_mots : MOT COMMA MOT'''
+        p[0] = [p[1], p[3]]
+        return p
+
+    def p_liste_mots(self,p):
+        '''liste_mots : MOT COMMA liste_mots'''
+        p[0] = [p[1]]+p[3]
         return p
 
     def p_premisse_mult(self, p):
@@ -266,11 +312,34 @@ class CustomParser(object):
         return p
 
     def p_error(self, p):
-        print("Syntax error in input!")
-        print(p)
+        raise ParsingException(p)
 
     def __init__(self, moteur : Moteur):
         self.tokens = CustomLexer.tokens
         self.moteur = moteur
         self.parser = yacc.yacc(module=self)
+        self.current_action : ParserAction = ParserAction.Default
+        self.current_line : int =  1
 
+
+    def handle_rule_coherence_exception(self, exception : RuleCoherenceException):
+        self.messageLigne()
+        print("Exception de cohérence de rêgle")
+    
+
+    def handle_functionNotFound_exception(self, exception):
+        self.messageLigne()
+        print("Cette fonction n'existe pas")
+
+
+    def handle_parsing_exception(self, exception : ParsingException):
+        self.messageLigne()
+        print(f"Erreur de parsing, appelez la fonction help() pour un rappel des syntaxes")
+        self.current_line += 1
+    
+    def handle_generic_exception(self, exception : Exception):
+        self.messageLigne()
+        print(str(exception))
+
+    def messageLigne(self):
+        print(f"ERREUR LIGNE : {self.current_line}")

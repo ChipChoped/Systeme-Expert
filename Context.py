@@ -44,7 +44,7 @@ class Context(object):
         
         self.rules[rule.name] = rule
     
-    def addMetarule(self, meta_rule_name : str, rule_list : list[str], sorted : bool = True):
+    def addMetarule(self, meta_rule_name : str, rule_list : list[str], ordered : bool = False, order_type : str = ""):
         concrete_rule_list : list[ConcreteRule] = list()
         if self.rules.get(meta_rule_name): # si écrasement de la rêgle...
             logging.debug("ecrasement")
@@ -55,9 +55,11 @@ class Context(object):
         for rule_name in rule_list :
             concrete_rule_list.append(self.rules.get(rule_name))
         
-        meta_rule : Metarule = Metarule(meta_rule_name, concrete_rule_list, sorted)
+        meta_rule : Metarule = Metarule(meta_rule_name, concrete_rule_list, ordered, order_type)
+
         if meta_rule in self.rules.values():
             raise RuleCoherenceException("duplicate meta rule found")
+            
         self.rules[meta_rule_name] = meta_rule
         [self.rules.pop(rule_name) for rule_name in rule_list]
 

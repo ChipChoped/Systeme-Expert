@@ -234,12 +234,31 @@ class ConcreteRule(Rule):
 
 
 class Metarule(Rule):
-    def __init__(self, name : str, rule_list : list[ConcreteRule], sorted : bool= True):
+    def __init__(self, name : str, rule_list : list[ConcreteRule], ordered : bool = False, order_type : str = ""):
         Rule.__init__(self, name)
         self.rule_list : list[ConcreteRule] = rule_list
+        if ordered:
+            print("ORDERED")
+            print(order_type)
+            if order_type == "ALPHA_ASC":
+                self.rule_list.sort(key=lambda r: r.name)
+            elif order_type == "ALPHA_DESC":
+                self.rule_list.sort(key=lambda r: r.name, reverse=True)
+            elif order_type == "PREM_ASC":
+                self.rule_list.sort(key=lambda r: len(r.premisse))
+            elif order_type == "PREM_DESC":
+                self.rule_list.sort(key=lambda r: len(r.premisse), reverse=True)
+            elif order_type == "CONS_ASC":
+                self.rule_list.sort(key=lambda r: len(r.consequence))
+            elif order_type == "CONS_DESC":
+                self.rule_list.sort(key=lambda r: len(r.consequence), reverse=True)
+            else :
+                raise Exception(f"Contrainte de tri ({order_type}) inconnue")
+            
 
-        if not sorted :
-            self.rule_list.sort(key=lambda rule : rule.name)
+
+
+
 
     def satisfy(self, facts : list[Element]) -> Optional[tuple[ConcreteRule, str]]: 
         for rule in self.rule_list:
@@ -256,7 +275,7 @@ class Metarule(Rule):
         return None
 
     def __str__(self):
-        return (f'<MetaR {self.name}  : '+(' > '.join([str(rule.name) for rule in self.rule_list]))+">" )
+        return (f'<MetaR {self.name}  : '+(' , '.join([str(rule.name) for rule in self.rule_list]))+">" )
 
     def __hash__(self) -> int:
         final_hash : int = 0
