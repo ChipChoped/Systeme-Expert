@@ -205,6 +205,10 @@ class Rule(ABC):
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
 
+    @abstractclassmethod
+    def getComplexity(self) -> int:
+        pass
+
 
 class ConcreteRule(Rule):
     def __init__(self, premisse : list[Constraint], consequence : list[Element], name : str):
@@ -230,6 +234,10 @@ class ConcreteRule(Rule):
         str_hash = '.'.join(sorted([cond.str_condensed() for cond in self.premisse]))+'_'+''.join(sorted([cond.str_condensed() for cond in self.consequence]))
         return hash(str_hash)
     
+    def getComplexity(self) -> int:
+        return len(self.premisse) + len(self.consequence)
+
+
     __repr__ = __str__
 
 
@@ -238,8 +246,6 @@ class Metarule(Rule):
         Rule.__init__(self, name)
         self.rule_list : list[ConcreteRule] = rule_list
         if ordered:
-            print("ORDERED")
-            print(order_type)
             if order_type == "ALPHA_ASC":
                 self.rule_list.sort(key=lambda r: r.name)
             elif order_type == "ALPHA_DESC":
@@ -255,10 +261,6 @@ class Metarule(Rule):
             else :
                 raise Exception(f"Contrainte de tri ({order_type}) inconnue")
             
-
-
-
-
 
     def satisfy(self, facts : list[Element]) -> Optional[tuple[ConcreteRule, str]]: 
         for rule in self.rule_list:
@@ -282,5 +284,9 @@ class Metarule(Rule):
         for hs in self.rule_list:
             final_hash += hs.__hash__()
         return hash(final_hash)
+
+    def getComplexity(self) -> int:
+        return sum([rule.getComplexity() for rule in self.rule_list])
+
 
     __repr__ = __str__

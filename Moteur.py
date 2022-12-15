@@ -48,14 +48,14 @@ class Moteur(object):
         # print(return_context)
 
         res = True
-        while simulation_context.rules.values() != [] and res and not objectives.satisfy(simulation_context.facts):
-            ajout  = Moteur.trouverCorrespondanceRegle(simulation_context.facts ,list(simulation_context.rules.values()))
+        while simulation_context.rule_list != [] and res and not objectives.satisfy(simulation_context.facts):
+            ajout  = Moteur.trouverCorrespondanceRegle(simulation_context.facts ,simulation_context.rule_list)
             if ajout is None:
                 res = False
             else :
                 [(simulation_context.addFact(copy.copy(fact)) , return_context.addFact(copy.copy(fact))) for fact in ajout[0].consequence]
                 return_context.addRule(ajout[0])
-                simulation_context.rules.pop(ajout[1])
+                simulation_context.removeRule(ajout[1])
             
             # print("simulation context :")
             # print(simulation_context)

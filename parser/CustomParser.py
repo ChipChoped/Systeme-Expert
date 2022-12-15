@@ -22,6 +22,16 @@ class CustomParser(object):
     def c_context(self, *args):
         print(self.moteur.context)
 
+    
+    def c_complexity(self, rule_selected):
+        rule = self.moteur.context.rules.get(rule_selected)
+        if rule is None:
+            self.handle_generic_exception(f"La règle sélectionnée ({rule_selected}) n'existe pas")
+        else : 
+            print(rule.getComplexity())
+
+
+
     def c_forward(self, hypothese_used, *args):
         print("chainage avant, avec pour but : "+str(hypothese_used))
 
@@ -32,6 +42,18 @@ class CustomParser(object):
     
         contexte_ajoute = self.moteur.chainageAvant(hypothese)
         print(f'Context ajouté : {contexte_ajoute}')
+        
+
+
+    def c_orderRules(self, critere):
+        if critere is None :
+            self.handle_generic_exception("Aucun critère choisi")
+        elif critere == "COMPLEX_ASC":
+            self.moteur.context.rule_list.sort(key=lambda r:r.getComplexity())
+        elif critere == "COMPLEX_DESC":
+            self.moteur.context.rule_list.sort(key=lambda r:r.getComplexity(), reverse=True)
+        else :
+            self.handle_generic_exception("Ce critère n'existe pas")
         
 
     def c_backward(self, *args):

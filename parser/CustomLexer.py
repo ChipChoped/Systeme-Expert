@@ -46,13 +46,11 @@ class CustomLexer(object):
         return t
 
     def t_error(self, t):
-        print(f"Illegal character ({t.value})")
         t.lexer.skip(1)
     
     def t_ID(self, t):
         r'[a-zA-Z_][a-zA-Z_0-9]*'
         t.type = reserved.get(t.value,'ID')    # Check for reserved words
-        print(f"Id déclanché, value : ({t.value})")
         return t
 
     def __init__(self):
