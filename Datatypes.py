@@ -2,6 +2,8 @@ from __future__ import annotations #permet de retourner ConcreteRule dans une Ru
 from abc import ABC, abstractclassmethod
 from enum import Enum
 from CoherenceExceptions import ConstraintCoherenceException
+from typing import Optional
+
 
 class VariableTypes(Enum):
     BOOLEAN = 1
@@ -96,7 +98,7 @@ class Hypothesis:
 
 
 class Number(Element):
-    def __init__(self, name : str, value : int | float):
+    def __init__(self, name : str, value : int):
         super().__init__(name, value, VariableTypes.NUMBER)
     
     def __str__(self):
@@ -186,11 +188,11 @@ class Rule(ABC):
         self.name = name
 
     @abstractclassmethod
-    def satisfy(self, facts : list[Element]) -> tuple[ConcreteRule, str] | None: 
+    def satisfy(self, facts : list[Element]) -> Optional[tuple[ConcreteRule, str]]:
         pass
 
     @abstractclassmethod
-    def concludes(self, fact: Element) -> tuple[ConcreteRule, str] | None:
+    def concludes(self, fact: Element) -> Optional[tuple[ConcreteRule, str]]:
         pass
 
     @abstractclassmethod
@@ -211,12 +213,12 @@ class ConcreteRule(Rule):
         self.premisse = premisse
         self.consequence = consequence
 
-    def satisfy(self, facts : dict[Element]) -> tuple[ConcreteRule, str] | None: 
+    def satisfy(self, facts : dict[Element]) -> Optional[tuple[ConcreteRule, str]]:
         if all([constraint.satisfiable(facts) for constraint in self.premisse]):
             return (self, self.name)
         return None
 
-    def concludes(self, fact : Element) -> tuple[ConcreteRule, str] | None:
+    def concludes(self, fact : Element) -> Optional[tuple[ConcreteRule, str]]:
         if self.consequence.count(fact):
         # if set(self.consequence).issubset(set(facts)):
             return self, self.name
@@ -240,14 +242,14 @@ class Metarule(Rule):
         if not sorted :
             self.rule_list.sort(key=lambda rule : rule.name)
 
-    def satisfy(self, facts : list[Element]) -> tuple[ConcreteRule, str] | None: 
+    def satisfy(self, facts : list[Element]) -> Optional[tuple[ConcreteRule, str]]:
         for rule in self.rule_list:
             ret = rule.satisfy(facts)
             if ret : 
                 return (rule, self.name)    
         return None
 
-    def concludes(self, fact : Element) -> tuple[ConcreteRule, str] | None:
+    def concludes(self, fact : Element) -> Optional[tuple[ConcreteRule, str]]:
         for rule in self.rule_list:
             ret = rule.concludes(fact)
             if ret:
