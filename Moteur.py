@@ -89,7 +89,7 @@ class Moteur(object):
         hypotheses: list[Constraint] = []
         return_context: list[tuple[Constraint, Context, bool]] = []
 
-        for rule in hypotheses_.rules:
+        for rule in hypotheses_.rule_list:
             hypotheses.append(rule.premisse[0])
 
         # liste les hypothèses
@@ -101,7 +101,7 @@ class Moteur(object):
 
     def recChainageArriere(self, hypothesis: Constraint, return_context: tuple[Context, bool]) -> tuple[Context, bool]:
         found_rule = self.trouverRegleConcluante(
-            hypothesis, list(self.context.facts.values()), list(self.context.rules.values()))
+            hypothesis, list(self.context.facts.values()), self.context.rule_list)
 
         if found_rule:
             true_hypothesis = True
