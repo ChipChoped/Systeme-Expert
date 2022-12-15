@@ -16,10 +16,16 @@ B13 : guest == NON WellLiked ET entree == DeadWish => chosenBeverage = Beer
 B14 : True => chosenBeverage = Water
 
 entree = DeadWish
-entree = Mexicain
+entree = Mexican
 guest = Sophisticated
 guest = NON WellLiked
 fete = NewYearsEve
 entree = Chicken
 
-H1 : chosenBeverage == BondChampagne, chosenBeverage == HonestHenryAppleWine, chosenBeverage == ToeLakesRose, chosenBeverage == DosEquis, chosenBeverage == Coors, chosenBeverage == Glops, chosenBeverage == CarrotJuice
+toBeServed = Carrots
+entree = NON Unknown
+guest = NON HealthNut
+guest = NON ToImpress
+entree = NON Steak
+
+H1 : chosenBeverage == BondChampagne, chosenBeverage == ChateauEarl, chosenBeverage == HonestHenryAppleWine, chosenBeverage == ToeLakesRose, chosenBeverage == DosEquis, chosenBeverage == Coors, chosenBeverage == Glops, chosenBeverage == CarrotJuice, chosenBeverage == Water
