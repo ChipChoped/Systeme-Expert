@@ -1,13 +1,14 @@
-from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes
+from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes, Constraint, EnumElem
 from Context import Context
 import logging
 import copy
 
-#TODO : résoudre le cassage du chainage avant
+
+# TODO : résoudre le cassage du chainage avant
 
 class Moteur(object):
 
-    def __init__(self, context : Context):
+    def __init__(self, context: Context):
         self.context = context
 
     def inputFact(self, fact: Element):
@@ -23,24 +24,24 @@ class Moteur(object):
         #     logging.error(r)
         #     self.rules.pop()
 
-    def inputHypothesis(self, hypothese : Hypothesis):
+    def inputHypothesis(self, hypothese: Hypothesis):
         self.context.addHypothesis(hypothese)
 
-    #crée une metaregle à partir de son nom et du nom de ses rêgles
-    def createMetarule(self, rule_name : str, rule_list : list[str], sorted : bool = True):
+    # crée une metaregle à partir de son nom et du nom de ses rêgles
+    def createMetarule(self, rule_name: str, rule_list: list[str], sorted: bool = True):
         self.context.addMetarule(rule_name, rule_list, sorted)
 
-    #sature les rêgles afin de déduire la plus grande base de faits possible
-    def chainageAvant(self, objectives : Hypothesis) -> Context:
+    # sature les rêgles afin de déduire la plus grande base de faits possible
+    def chainageAvant(self, objectives: Hypothesis) -> Context:
 
-        if objectives is None : 
+        if objectives is None:
             logging.warning("No objective was given")
-            objectives = Hypothesis("default", [Constraint(Boolean("unsatisfiable_default_constraint", True), VariableTypes)])
+            objectives = Hypothesis("default",
+                                    [Constraint(Boolean("unsatisfiable_default_constraint", True), VariableTypes)])
 
+        return_context: Context = Context()
 
-        return_context : Context = Context()
-
-        simulation_context : Context = copy.deepcopy(self.context)
+        simulation_context: Context = copy.deepcopy(self.context)
         # print("simulation context :")
         # print(simulation_context)
         # print("return_context :")
@@ -48,14 +49,15 @@ class Moteur(object):
 
         res = True
         while simulation_context.rules.values() != [] and res and not objectives.satisfy(simulation_context.facts):
-            ajout  = Moteur.trouverCorrespondanceRegle(simulation_context.facts ,list(simulation_context.rules.values()))
+            ajout = Moteur.trouverCorrespondanceRegle(simulation_context.facts, list(simulation_context.rules.values()))
             if ajout is None:
                 res = False
-            else :
-                [(simulation_context.addFact(copy.copy(fact)) , return_context.addFact(copy.copy(fact))) for fact in ajout[0].consequence]
+            else:
+                [(simulation_context.addFact(copy.copy(fact)), return_context.addFact(copy.copy(fact))) for fact in
+                 ajout[0].consequence]
                 return_context.addRule(ajout[0])
                 simulation_context.rules.pop(ajout[1])
-            
+
             # print("simulation context :")
             # print(simulation_context)
             # print("return_context :")
@@ -65,7 +67,7 @@ class Moteur(object):
 
     # cherche une rêgle afin d'étendre la base de faits
     # renvoie un tuple (index_regle, [faits_deduits]) ou None
-    def trouverCorrespondanceRegle(base_de_faits : list[Element], base_de_regles : list[Rule]) -> 'ConcreteRule | None':
+    def trouverCorrespondanceRegle(base_de_faits: list[Element], base_de_regles: list[Rule]) -> 'ConcreteRule | None':
         """Match rule"""
         for regle in base_de_regles:
             ret = regle.satisfy(base_de_faits)
@@ -73,8 +75,7 @@ class Moteur(object):
                 return ret
         return None
 
-   
-    def satisfaction_regle(base_de_faits : list, regle : Rule):
+    def satisfaction_regle(base_de_faits: list, regle: Rule):
         for element in regle.premisse:
             if element in base_de_faits:
                 continue
@@ -82,42 +83,67 @@ class Moteur(object):
                 return False
         return True
 
+    def chainageArriere(self, hypotheses_: Hypothesis) -> list[tuple[Constraint, Context, bool]]:
+        i = 1
+        hypotheses: list[Constraint] = []
+        return_context: list[tuple[Constraint, Context, bool]] = []
 
-    def chainageArriere(self, hypotheses : list[str]):
-        right_hypotheses = []
-        hypotheses = [Element(hypothesis, True) for hypothesis in hypotheses]
-
-        simulation_context: Context = copy.deepcopy(self.context)
+        for rule in hypotheses_.rules:
+            hypotheses.append(rule.premisse[0])
 
         # liste les hypothèses
         for hypothesis in hypotheses:
-            #liste les rêgles
-            for rule in list(simulation_context.rules.values()):
-                # recherche de rêgle concluante 
-                returned_rule = rule.concludes(hypothesis)
-                if returned_rule:
-                    # recherche de conflits avec la base de connaissances virtuelle
-                    for fact in list(simulation_context.facts.values()):
-                        if fact.conflicts(returned_rule[0].consequence):
-                            break
-                        
-                        # application de la rêgle
-                        applicable_rule = True
+            context = self.recChainageArriere(hypothesis, (Context(), True))
+            return_context.append((hypothesis, context[0], context[1]))
 
-                        for premisse in returned_rule[0].premisse:
-                            if premisse.conflicts(list(simulation_context.facts.values())):
-                                applicable_rule = False
+        return return_context
 
-                        if applicable_rule:
-                            true_hypothesis = True
-                            for premisse in returned_rule[0].premisse:
-                                if list(simulation_context.facts.values()).count(premisse) == 0:
-                                    if not self.chainageArriere([premisse.name]):
-                                        true_hypothesis = False
-                                        break
+    def recChainageArriere(self, hypothesis: Constraint, return_context: tuple[Context, bool]) -> tuple[Context, bool]:
+        found_rule = self.trouverRegleConcluante(
+            hypothesis, list(self.context.facts.values()), list(self.context.rules.values()))
 
-                            if true_hypothesis:
-                                right_hypotheses.append(hypothesis)
-                                break
+        if found_rule:
+            true_hypothesis = True
+            for premisse in found_rule[0].premisse:
+                # if list(self.context.facts.values()).count(premisse.elem) == 0:
+                if not self.faitConnu(premisse.elem, list(self.context.facts.values())):
+                    return_context = self.recChainageArriere(premisse, return_context)
+                    if not return_context[1]:
+                        true_hypothesis = False
+                        break
 
-        return right_hypotheses
+            if true_hypothesis:
+                for premisse in found_rule[0].premisse:
+                    return_context[0].addFact(premisse.elem)
+                return_context[0].addRule(found_rule[0])
+
+                return return_context[0], True
+
+        return return_context[0], False
+
+    def faitConnu(self, researched_fact: Element, facts: [Element]):
+        for fact in facts:
+            if fact.equal(researched_fact):
+                return True
+
+        return False
+
+    def trouverRegleConcluante(self, hypothesis: Constraint, facts: list[Element], rules: list[Rule]):
+        """Match rule"""
+        for rule in rules:
+            found_rule = rule.concludes(hypothesis.elem)
+            if found_rule:
+                conflict = False
+                for fact in facts:
+                    if fact.conflicts(found_rule[0].consequence):
+                        conflict = True
+
+                if not conflict:
+                    for premisse in found_rule[0].premisse:
+                        if premisse.elem.conflicts(list(self.context.facts.values())):
+                            conflict = True
+
+                if not conflict:
+                    return found_rule
+
+        return None
