@@ -17,7 +17,7 @@ class CustomParser(object):
             for line in file:
                 self.parser.parse(line)
         except Exception as e:
-            self.handle_parsing_exception("File not found")
+            self.handle_generic_exception(Exception(f"Le fichier {file_path} n'existe pas"))
 
     def c_context(self, *args):
         print(self.moteur.context)
@@ -117,7 +117,7 @@ class CustomParser(object):
         '''enum_list : boolean COMMA enum_list'''
         p[0] = p[3]
         if not p[0].override(p[1]):
-            raise FactCoherenceException("This enumeration is not coherent")
+            raise FactCoherenceException(f"Cette énumération n'est pas cohérente")
         return p
 
     def p_enum_with_list(self,p):
@@ -204,16 +204,6 @@ class CustomParser(object):
         p[0] = Constraint(value, p[2])
         return p
 
-    def p_arguments_ordonnes(self, p):
-        '''ordonnes : MOT GREATER ordonnes'''
-        p[0] = [p[1]]+p[3]
-        return p
-
-    def p_argument_ordonne_seul(self, p):
-        '''ordonnes : MOT GREATER MOT'''
-        p[0] = [p[1], p[3]]
-        return p
-
     def p_ensemble_arguments(self, p):
         '''argument : MOT COMMA argument'''
         p[0] = [p[1]]+p[3]
@@ -259,7 +249,7 @@ class CustomParser(object):
 
 
     def p_metaregle_exclusive_ordonne(self, p):
-        '''metaregle : MOT DEUX_POINTS OPEN_BRACK ordonnes CLOSE_BRACK'''
+        '''metaregle : MOT DEUX_POINTS OPEN_BRACK liste_mots CLOSE_BRACK'''
         logging.debug(f'Metaregle détectée : {p[1]}, {p[4]}')
         self.current_action.MetaRule
         meta : Metarule
@@ -312,7 +302,7 @@ class CustomParser(object):
         return p
 
     def p_error(self, p):
-        raise ParsingException(p)
+        self.handle_parsing_exception()
 
     def __init__(self, moteur : Moteur):
         self.tokens = CustomLexer.tokens
@@ -332,7 +322,7 @@ class CustomParser(object):
         print("Cette fonction n'existe pas")
 
 
-    def handle_parsing_exception(self, exception : ParsingException):
+    def handle_parsing_exception(self):
         self.messageLigne()
         print(f"Erreur de parsing, appelez la fonction help() pour un rappel des syntaxes")
         self.current_line += 1

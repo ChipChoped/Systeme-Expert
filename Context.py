@@ -23,7 +23,7 @@ class Context(object):
         if check_fact is not None:
             self.checkTypeCoherence(check_fact)
             if not check_fact.override(added_fact):
-                raise FactCoherenceException(f'conflict between {fact} inserted and {check_fact} already existing')
+                raise FactCoherenceException(f'Conflit entre {fact} inséré et {check_fact} qui existe déja')
         else:
             self.bindType(added_fact)
             self.facts[added_fact.name] = added_fact
@@ -37,7 +37,7 @@ class Context(object):
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):
         if rule in self.rules.values():
-            raise RuleCoherenceException("duplicate rules found")
+            raise RuleCoherenceException("Rêgles dupliquées")
         
         self.checkTypeCoherenceRule(rule)
         self.bindTypeRule(rule)
@@ -59,7 +59,7 @@ class Context(object):
 
         if meta_rule in self.rules.values():
             raise RuleCoherenceException("duplicate meta rule found")
-            
+
         self.rules[meta_rule_name] = meta_rule
         [self.rules.pop(rule_name) for rule_name in rule_list]
 

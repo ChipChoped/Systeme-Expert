@@ -4,13 +4,13 @@ B3 : CheapWine ET EntreeChicken ET NON GuestWellLiked => HonestHenryAppleWine
 B4 : CheapWine ET EntreeUnknown => ToeLakesRose
 B5 : BeerIndicated ET EntreeMexican => DosEquis
 B6 : BeerIndicated => Coors
-BeerRules : [B5 > B6]
+BeerRules : [B5 , B6]
 B7 : GuestHealthNut => Glops
 B8 : GuestHealthNut ET NON CarrotsToBeServed => CarrotJuice
 B9 : Wine ET GuestImpressed => ExpWine
 B10 : Wine => CheapWine
 B11 : GuestSophisticated => Wine
-WineRules : [B9 > B10]
+WineRules : [B9 , B10]
 B12 : EntreeMexican => BeerIndicated
 B13 : NON GuestWellLiked ET EntreeDeadWish => BeerIndicated
 B14 : True => Water

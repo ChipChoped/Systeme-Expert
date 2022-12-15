@@ -6,22 +6,18 @@
 
 ## Context : 
 - Gestion d'exception : 
-    - fonction non existente
-    - erreur parsing
+    - fonction non existante X
+    - erreur parsing X
     - erreur de coherence
         - Regle
-        - Fait
+        - Fait X
         - Contrainte
         - Type
 
 - Message spécifique par type d'exception
 
-- Gérer la cohérence
 - Meilleur fonctionnement des métarègles
-    - Pouvoir spécifier un ordre de tri ["ALPHA_ASC", "ALPHA_DESC", "PREM_ASC", "PREM_DESC", "CONS_ASC", "CONS_DESC"]
+    - Pouvoir spécifier un ordre de tri ["ALPHA_ASC", "ALPHA_DESC", "PREM_ASC", "PREM_DESC", "CONS_ASC", "CONS_DESC"] X
 
 ## Datatype : 
 - Écrasement de variables déja existantes ? 
-
-
-load("test_samples/test_ordre_metaregle")
