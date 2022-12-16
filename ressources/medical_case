@@ -1,0 +1,22 @@
+R1 : BodyTemperature >= 38 ET NON Pregnant => DrugPrescribed = ibuprofen ET StomachAche
+R2 : BodyTemperature >= 38 => DrugPrescribed = paracetamol
+R3 : StomachAche ET BodyTemperature < 38 => DrugPrescribed = spasfon
+R4 : StomachAche ET Fever ET NON Pregnant => DrugPrescribed = omeprazole ET Stress
+R5 : StomachAche ET Period ET NON Pregnant => antadys
+R6 : NON Insomnia ET season == Winter => DrugPrescribed = vitaminD
+R7 : Insomnia ET NON Pregnant => DrugPrescribed = doxylamine ET NON canDrive
+R8 : Stress => Spasmine ET NON Insomnia ET NON canDrive
+R9 : Stress => StomachAche ET Insomnia
+
+MR1 : [R8, R9]
+
+Stress
+NON Pregnant
+season = Spring
+BodyTemperature = 38
+NON Period
+NON canDrive
+
+H1 : DrugPrescribed == paracetamol
+
+Vitamine : DrugPrescribed == vitaminD
