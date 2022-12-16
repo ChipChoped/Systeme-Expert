@@ -45,7 +45,7 @@ class Context(object):
         self.checkTypeCoherenceRule(rule)
 
         #check duplicata
-        if self.rules.get(rule.name) is not None or rule in self.rule_list:
+        if self.rules.get(rule.name) is not None or rule in list(self.rules.values()):
             raise RuleCoherenceException("Rêgles dupliquées")
 
         self.bindTypeRule(rule)

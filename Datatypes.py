@@ -66,6 +66,10 @@ class Element(ABC):
     
     def equal(self, other)->bool:
         return other.type == self.type and other.value == self.value
+    
+    @abstractclassmethod
+    def verboseStr(self) -> str:
+        pass
 
     __repr__ = __str__
 
@@ -84,6 +88,9 @@ class Boolean(Element):
     def __hash__(self):
         return hash(self.str_condensed())
     
+    def verboseStr(self) -> str:
+        return f"{self.name} EST {'NEGATIF' if not self.value else 'POSITIF'}"
+
     __repr__ = __str__
 
 class Hypothesis:
@@ -124,6 +131,10 @@ class Number(Element):
 
     def __hash__(self):
         return hash(self.name+'_'+str(self.value))
+    
+    def verboseStr(self) -> str:
+        return f"{self.name} EST EGAL À {self.value}"
+
 
     __repr__ = __str__
  
@@ -158,6 +169,10 @@ class EnumElem(Element):
         else:
             return False
     
+    def verboseStr(self) -> str:
+        return f"{self.name} CONTIENT [{' | '.join([elem.verboseStr() for elem in list(self.value.values())])}]"
+
+
     def equal(self, element : EnumElem) -> bool:
         """l'autre enum est un subset de celle-ci"""
         return element.type == self.type and all([self.value.get(elem.name) is not None and self.value.get(elem.name) == elem for elem in list(element.value.values())])
@@ -244,12 +259,16 @@ class ConcreteRule(Rule):
     def __str__(self):
         return (self.name + ' : '+(', '.join([str(elem) for elem in self.premisse])) + ' -> ' + (', '.join(str(elem) for elem in self.consequence)))
 
+    def verboseStr(self):
+        return (self.name + ' : SI '+(' ET '.join([str(elem) for elem in self.premisse])) + ' ALORS ' + (', '.join(str(elem) for elem in self.consequence)))
+
+
     def __hash__(self) -> int:
         
         premisse_hash = hash(sum([elem.__hash__() for elem in sorted(self.premisse,key=attrgetter("elem.name", "operator"))]))
         consequence_hash = hash(sum([elem.__hash__() for elem in sorted(self.consequence,key=attrgetter("name", "value"))]))
     
-        return hash(premisse_hash + consequence_hash)
+        return hash(premisse_hash + consequence_hash * 2)
 
     
     def getComplexity(self) -> int:

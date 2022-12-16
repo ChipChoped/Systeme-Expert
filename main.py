@@ -20,7 +20,7 @@ if __name__ == "__main__":
     lexer = CustomLexer().lexer
     while 1:
         try:
-            s = input('test > ')
+            s = input('m0+ > ')
         except EOFError:
             break
         if s == "\n":
@@ -29,10 +29,8 @@ if __name__ == "__main__":
             custom.parser.parse(s)
         except RuleCoherenceException as e:
             custom.handle_rule_coherence_exception(e)
-        # except Exception as e : 
-        #     custom.handle_generic_exception(e)
-        # except ParsingException as e:
-        #     custom.handle_parsing_exception(e)
+        except Exception as e : 
+            custom.handle_generic_exception(e)
 
         logging.info("Etat du context : \n"+str(moteur.context))
     # result = custom.parser.parse(prompt)

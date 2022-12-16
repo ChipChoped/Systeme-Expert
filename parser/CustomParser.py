@@ -45,7 +45,18 @@ class CustomParser(object):
         else : 
             hypothese = None    
         contexte_ajoute = self.moteur.chainageAvant(hypothese)
-        print(f'Context ajouté : {contexte_ajoute}')
+
+        print()
+        print("--------------------")
+        print("Règles ajoutées (dans l'ordre) : ")
+        for regle in contexte_ajoute.rule_list:
+            print(regle.verboseStr())
+        print()
+        print("--------------------")
+        print("Faits ajoutés : ")
+        for fait in list(contexte_ajoute.facts.values()):
+            print(fait.verboseStr())
+        
 
 
     def c_orderRules(self, critere):
@@ -57,7 +68,17 @@ class CustomParser(object):
             self.moteur.context.rule_list.sort(key=lambda r:r.getComplexity(), reverse=True)
         else :
             self.handle_generic_exception("Ce critère n'existe pas")
-        
+
+
+    def c_help(self):
+        print("Moteur d'inférence 0+")
+        print("Assigner une valeur à un fait : NomFait = Valeur")
+        print("Ajouter une règle : NomRegle : CONDITION1 ET CONDITION2.... => ASSIGNATION1, ASSIGNATION2...")
+        print("Ajouter une métarègle : NomRegle : [Regle1, Regle2][TYPE_TRI]")
+        print("TYPE_TRI € [ALPHA_ASC, ALPHA_DESC, PREM_ASC, PREM_DESC, CONS_ASC, CONS_DESC]")
+        print("Ajouter une hypothèse / objectif : NomHypothese : CONDITION1, CONDITION2....")
+        print("Chainage avant : forward(objectif)")
+        print("Chainage avant : backward(hypothèse)")
 
     def c_backward(self, hypotheses_used, *args):
         print("chainage arrière, avec pour hypothèses : " + str(args))
@@ -137,11 +158,11 @@ class CustomParser(object):
 
     def p_fonction_no_arg(self, p):
         '''fonction : MOT OPEN_PAR CLOSE_PAR'''
-        # try :
-        fun = getattr(self, "c_"+p[1])
-        fun()
-        # except Exception as e: 
-        #     self.handle_functionNotFound_exception(e)
+        try :
+            fun = getattr(self, "c_"+p[1])
+            fun()
+        except Exception as e: 
+            self.handle_functionNotFound_exception(e)
 
         logging.debug(f'fonction détectée !')
 
