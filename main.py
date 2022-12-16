@@ -13,11 +13,12 @@ if __name__ == "__main__":
 
     logging.basicConfig(encoding='utf-8', level=logging.WARNING)
 
-    print("test du lexer, entrez ce que vous voulez !")
+    # print("test du lexer, entrez ce que vous voulez !")
 
     moteur = Moteur(Context())
     custom = CustomParser(moteur)
     lexer = CustomLexer().lexer
+    custom.c_help()
     while 1:
         try:
             s = input('m0+ > ')

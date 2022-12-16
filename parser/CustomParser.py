@@ -32,7 +32,6 @@ class CustomParser(object):
             print(rule.getComplexity())
 
 
-
     def c_forward(self, hypothese_used = None, *args):
         print("chainage avant, avec pour but : "+str(hypothese_used))
 
@@ -151,8 +150,10 @@ class CustomParser(object):
         try : 
             fun = getattr(self, "c_"+p[1])
             fun(*p[3])
-        except Exception as e: 
+        except AttributeError as e:
             self.handle_functionNotFound_exception(e)
+        except Exception as e: 
+            self.handle_generic_exception(e)
     
         logging.debug(f'fonction détectée !, {p[1]}')
 
@@ -161,8 +162,10 @@ class CustomParser(object):
         try :
             fun = getattr(self, "c_"+p[1])
             fun()
-        except Exception as e: 
+        except AttributeError as e:
             self.handle_functionNotFound_exception(e)
+        except Exception as e: 
+            self.handle_generic_exception(e)
 
         logging.debug(f'fonction détectée !')
 
