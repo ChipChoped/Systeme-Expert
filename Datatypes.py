@@ -3,6 +3,7 @@ from abc import ABC, abstractclassmethod
 from enum import Enum
 from CoherenceExceptions import ConstraintCoherenceException
 from typing import Optional
+from operator import attrgetter
 
 class VariableTypes(Enum):
     BOOLEAN = 1
@@ -80,6 +81,9 @@ class Boolean(Element):
     def str_condensed(self)->str:
         return ('' if self.value else 'N-')+self.name
     
+    def __hash__(self):
+        return hash(self.str_condensed())
+    
     __repr__ = __str__
 
 class Hypothesis:
@@ -117,6 +121,9 @@ class Number(Element):
     
     def lessOrEqual(self, other) -> bool:
         return other.type == self.type and self.value <= other.value
+
+    def __hash__(self):
+        return hash(self.name+'_'+str(self.value))
 
     __repr__ = __str__
  
@@ -156,6 +163,9 @@ class EnumElem(Element):
         return element.type == self.type and all([self.value.get(elem.name) is not None and self.value.get(elem.name) == elem for elem in list(element.value.values())])
 
     
+    def __hash__(self):
+        return hash(sum([elem.__hash__() for elem in sorted(list(self.value.values()),key=attrgetter('name'))]))
+
     __repr__ = __str__
 
 class Constraint(object):
@@ -178,6 +188,10 @@ class Constraint(object):
     
     def satisfiable(self, other : dict[Element]):
         return False if other.get(self.elem.name) is None else self.satisfy(other[self.elem.name])
+
+    def __hash__(self):
+        return hash(self.elem.__hash__() + int(self.operator) + int(self.positive))
+
     __repr__ = __str__
 
 
@@ -231,8 +245,12 @@ class ConcreteRule(Rule):
         return (self.name + ' : '+(', '.join([str(elem) for elem in self.premisse])) + ' -> ' + (', '.join(str(elem) for elem in self.consequence)))
 
     def __hash__(self) -> int:
-        str_hash = '.'.join(sorted([cond.str_condensed() for cond in self.premisse]))+'_'+''.join(sorted([cond.str_condensed() for cond in self.consequence]))
-        return hash(str_hash)
+        
+        premisse_hash = hash(sum([elem.__hash__() for elem in sorted(self.premisse,key=attrgetter("elem.name", "operator"))]))
+        consequence_hash = hash(sum([elem.__hash__() for elem in sorted(self.consequence,key=attrgetter("name", "value"))]))
+    
+        return hash(premisse_hash + consequence_hash)
+
     
     def getComplexity(self) -> int:
         return len(self.premisse) + len(self.consequence)

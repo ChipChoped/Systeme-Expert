@@ -37,10 +37,17 @@ class Context(object):
 
 #TODO : Améliorer la détection de double règles, même dans les métarègles !!
     def addRule(self, rule: ConcreteRule):
-        if self.rules.get(rule.name) is not None and rule in self.rule_list:
-            raise RuleCoherenceException("Rêgles dupliquées")
         
+        elems_premisse = [contrainte.elem for contrainte in rule.premisse]
+        if any([cons.conflicts(elems_premisse) for cons in rule.consequence]):
+            raise RuleCoherenceException("Cette règle est incohérente car conflictuelle")
+
         self.checkTypeCoherenceRule(rule)
+
+        #check duplicata
+        if self.rules.get(rule.name) is not None or rule in self.rule_list:
+            raise RuleCoherenceException("Rêgles dupliquées")
+
         self.bindTypeRule(rule)
         
         self.rules[rule.name] = rule
@@ -82,7 +89,7 @@ class Context(object):
  
     def checkTypeCoherence(self, element : Element):
         if self.type_binding.get(element.name) is not None and self.type_binding[element.name] != element.type:
-            raise TypeCoherenceException(f'Element {element.name} already declared as {self.type_binding[element.name]}, trying to rebind it as {element.type}')
+            raise TypeCoherenceException(f'Element {element.name} déja déclaré sous le type {self.type_binding[element.name]}, vous essayez de le re-typer en {element.type}')
 
     def checkTypeCoherenceRule(self, rule : ConcreteRule):
         [self.checkTypeCoherence(constraint.elem) for constraint in rule.premisse]

@@ -14,9 +14,10 @@ class CustomParser(object):
     def c_load(self, file_path, *args):
         try:
             file : TextIoWrapper = open(file_path, "r")
+            new_parser = CustomParser(self.moteur, file_path)
             for line in file:
-                self.parser.parse(line)
-        except Exception as e:
+                new_parser.parser.parse(line)
+        except FileNotFoundError as e:
             self.handle_generic_exception(Exception(f"Le fichier {file_path} n'existe pas"))
 
     def c_context(self, *args):
@@ -32,14 +33,17 @@ class CustomParser(object):
 
 
 
-    def c_forward(self, hypothese_used, *args):
+    def c_forward(self, hypothese_used = None, *args):
         print("chainage avant, avec pour but : "+str(hypothese_used))
 
-        hypothese = self.moteur.context.hypothesis.get(hypothese_used)
+        if hypothese_used is not None:
+            hypothese = self.moteur.context.hypothesis.get(hypothese_used)
 
-        if hypothese is None:
-            raise MissingArguments("L'Hypothèse entrée en paramètre n'existe pas")
-
+            if hypothese is None:
+                handle_generic_exception(Exception("L'Hypothèse entrée en paramètre n'existe pas"))
+                return 
+        else : 
+            hypothese = None    
         contexte_ajoute = self.moteur.chainageAvant(hypothese)
         print(f'Context ajouté : {contexte_ajoute}')
 
@@ -133,11 +137,11 @@ class CustomParser(object):
 
     def p_fonction_no_arg(self, p):
         '''fonction : MOT OPEN_PAR CLOSE_PAR'''
-        try :
-            fun = getattr(self, "c_"+p[1])
-            fun()
-        except Exception as e: 
-            self.handle_functionNotFound_exception(e)
+        # try :
+        fun = getattr(self, "c_"+p[1])
+        fun()
+        # except Exception as e: 
+        #     self.handle_functionNotFound_exception(e)
 
         logging.debug(f'fonction détectée !')
 
@@ -351,9 +355,10 @@ class CustomParser(object):
     def p_error(self, p):
         self.handle_parsing_exception()
 
-    def __init__(self, moteur: Moteur):
+    def __init__(self, moteur: Moteur, fichier_actuel :str = "Main"):
         self.tokens = CustomLexer.tokens
         self.moteur = moteur
+        self.fichier_actuel = fichier_actuel
         self.parser = yacc.yacc(module=self)
         self.current_action : ParserAction = ParserAction.Default
         self.current_line : int =  1
@@ -362,21 +367,22 @@ class CustomParser(object):
     def handle_rule_coherence_exception(self, exception : RuleCoherenceException):
         self.messageLigne()
         print("Exception de cohérence de rêgle")
+        print(exception)
+        self.current_line += 1
     
 
     def handle_functionNotFound_exception(self, exception):
         self.messageLigne()
         print("Cette fonction n'existe pas")
 
-
     def handle_parsing_exception(self):
         self.messageLigne()
         print(f"Erreur de parsing, appelez la fonction help() pour un rappel des syntaxes")
-        self.current_line += 1
     
     def handle_generic_exception(self, exception : Exception):
         self.messageLigne()
         print(str(exception))
 
     def messageLigne(self):
+        print(f"ERREUR DANS {self.fichier_actuel}")
         print(f"ERREUR LIGNE : {self.current_line}")

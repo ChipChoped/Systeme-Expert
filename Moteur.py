@@ -1,4 +1,4 @@
-from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes, Constraint, EnumElem
+from Datatypes import Element, Rule, ConcreteRule, Hypothesis, VariableTypes, Constraint, EnumElem, Boolean, OperatorTypes
 from Context import Context
 import logging
 import copy
@@ -36,9 +36,9 @@ class Moteur(object):
     def chainageAvant(self, objectives: Hypothesis) -> Context:
 
         if objectives is None:
-            logging.warning("No objective was given")
+            logging.warning("Aucun objectif donné, saturation de la base de faits")
             objectives = Hypothesis("default",
-                                    [Constraint(Boolean("unsatisfiable_default_constraint", True), VariableTypes)])
+                                    [ConcreteRule([Constraint(Boolean("unsatisfiable_default_constraint", True), OperatorTypes.EQUALS)], [], "unsatisfiable")])
 
         return_context: Context = Context()
 
