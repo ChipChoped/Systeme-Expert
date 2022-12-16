@@ -106,7 +106,7 @@ class CustomParser(object):
 
         print("Hypothèses fausse :\n")
 
-        for hypothesis in proven_hypotheses:
+        for hypothesis in disproven_hypotheses:
             print(f'Hypothèse recherchée : {hypothesis[0].elem}')
             print(f'Faits rencontrés : {dict(reversed(list(hypothesis[1].facts.items())))}')
             print(f'Règles utilisées : {dict(reversed(list(hypothesis[1].rules.items())))}\n')
@@ -147,12 +147,12 @@ class CustomParser(object):
 
     def p_fonction_arg(self, p):
         '''fonction : MOT OPEN_PAR argument CLOSE_PAR'''
-        try : 
+        try :
             fun = getattr(self, "c_"+p[1])
             fun(*p[3])
         except AttributeError as e:
             self.handle_functionNotFound_exception(e)
-        except Exception as e: 
+        except Exception as e:
             self.handle_generic_exception(e)
     
         logging.debug(f'fonction détectée !, {p[1]}')
