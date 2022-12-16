@@ -14,9 +14,13 @@ Stress
 NON Pregnant
 season = Spring
 BodyTemperature = 38
-NON Period
+Period
 NON canDrive
+NON Insomnia
+StomachAche
+NON Fever
 
+StressDrugs : DrugPrescribed == paracetamol, DrugPrescribed == omeprazole, DrugPrescribed == doxylamine
 H1 : DrugPrescribed == paracetamol
 
 Vitamine : DrugPrescribed == vitaminD
