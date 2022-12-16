@@ -64,6 +64,11 @@ class Moteur(object):
             # print("return_context :")
             # print(return_context)
 
+        if not objectives.satisfy(simulation_context.facts):
+            print("------ OBJECTIF NON ATTEINT -----")
+        else :
+            print("--- OBJECTIF ATTEINT ---")
+
         return return_context
 
     # cherche une rêgle afin d'étendre la base de faits
