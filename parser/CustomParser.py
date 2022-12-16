@@ -55,10 +55,10 @@ class CustomParser(object):
             self.handle_generic_exception("Ce critère n'existe pas")
         
 
-    def c_backward(self, *args):
+    def c_backward(self, hypotheses_used, *args):
         print("chainage arrière, avec pour hypothèses : " + str(args))
 
-        hypotheses = self.moteur.context.hypothesis.get(hypothese_used)
+        hypotheses = self.moteur.context.hypothesis.get(hypotheses_used)
 
         if hypotheses is None:
             raise MissingArguments("L'Hypothèse entrée en paramètre n'existe pas")
