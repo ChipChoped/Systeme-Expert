@@ -106,7 +106,7 @@ class CustomParser(object):
 
         print("Hypothèses fausse :\n")
 
-        for hypothesis in proven_hypotheses:
+        for hypothesis in disproven_hypotheses:
             print(f'Hypothèse recherchée : {hypothesis[0].elem}')
             print(f'Faits rencontrés : {dict(reversed(list(hypothesis[1].facts.items())))}')
             print(f'Règles utilisées : {dict(reversed(list(hypothesis[1].rules.items())))}\n')
