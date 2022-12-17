@@ -5,7 +5,7 @@ R4 : StomachAche ET Fever ET NON Pregnant => DrugPrescribed = omeprazole ET Stre
 R5 : StomachAche ET Period ET NON Pregnant => antadys
 R6 : NON Insomnia ET season == Winter => DrugPrescribed = vitaminD
 R7 : Insomnia ET NON Pregnant => DrugPrescribed = doxylamine ET NON canDrive
-R8 : Stress => Spasmine ET NON Insomnia ET NON canDrive
+R8 : Stress => DrugPrescribed = spasmine ET NON Insomnia ET NON canDrive
 R9 : Stress => StomachAche ET Insomnia
 
 MR1 : [R8, R9]
