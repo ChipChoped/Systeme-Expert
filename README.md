@@ -1,6 +1,6 @@
 # Systeme-Expert Moteur 0+
 
-Ce système utilise PLY pour traduire Lex/Yacc
+Le parser est généré par la bibliothèque PLY, une traduction python des bibliothèques Lex/Yacc. Le code source servant à générer le parser se trouve dans le fichier parser/CustomParser.py
 
 Exécuter le fichier main.py lance le parser afin de pouvoir utiliser le système expert
 > python3 main.py
